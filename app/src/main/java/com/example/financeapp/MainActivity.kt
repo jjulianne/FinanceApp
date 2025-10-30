@@ -19,6 +19,8 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.financeapp.ui.screens.LaunchScreen
+import com.example.financeapp.ui.screens.SplashScreen
 import com.example.financeapp.ui.theme.FinanceAppTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -40,18 +42,46 @@ class MainActivity : ComponentActivity() {
  */
 @Composable
 fun AppNavigation() {
-    // Se crea el controlador de navegacion que recordara el estado (backstack, etc.)
     val navController = rememberNavController()
 
-    // Usamos NavHost porque es el contenedor que intercambia los composables (pantallas)
     NavHost(
         navController = navController,
-        startDestination = "home_screen" // Define la pantalla de inicio
+        startDestination = "splash_screen" // Cambiado a splash como pantalla inicial
     ) {
-        // Definimos la navegacion
+        // Pantalla Splash (carga inicial)
+        composable(route = "splash_screen") {
+            SplashScreen(
+                onNavigateToNext = {
+                    navController.navigate("launch_screen") {
+                        // Eliminar splash del back stack para que no se pueda volver
+                        popUpTo("splash_screen") { inclusive = true }
+                    }
+                }
+            )
+        }
+
+
+        // Pantalla Launch (Login/Sign Up)
+        composable(route = "launch_screen") {
+            LaunchScreen(
+                onNavigateToLogin = {
+                    navController.navigate("login_screen")
+                },
+                onNavigateToSignUp = {
+                    navController.navigate("signup_screen")
+                },
+                onNavigateToForgotPassword = {
+                    navController.navigate("forgot_password_screen")
+                }
+            )
+        }
+
+        // Pantalla Home (principal)
         composable(route = "home_screen") {
             HomeScreen(navController = navController)
         }
+
+        // Pantalla de detalle
         composable(route = "detail_screen") {
             DetailScreen(navController = navController)
         }
@@ -73,7 +103,6 @@ fun HomeScreen(navController: NavController, modifier: Modifier = Modifier) {
             Text(text = "Estás en la Pantalla Principal")
             Button(
                 onClick = {
-                    // Accion de navegacion: ir a la pantalla de detalle
                     navController.navigate("detail_screen")
                 },
                 modifier = Modifier.padding(top = 16.dp)
@@ -97,7 +126,6 @@ fun DetailScreen(navController: NavController, modifier: Modifier = Modifier) {
             Text(text = "¡Esta es la Pantalla de Detalles!")
             Button(
                 onClick = {
-                    // Accion de navegacion: volver a la pantalla anterior
                     navController.popBackStack()
                 },
                 modifier = Modifier.padding(top = 16.dp)
