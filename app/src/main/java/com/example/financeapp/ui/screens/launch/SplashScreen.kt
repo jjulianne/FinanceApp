@@ -1,4 +1,4 @@
-package com.example.financeapp.ui.screens
+package com.example.financeapp.ui.screens.launch
 
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.FastOutSlowInEasing
@@ -14,7 +14,11 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -25,22 +29,32 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.financeApp.R
+import com.example.financeapp.domain.use_case.auth.CheckAuthState
 import kotlinx.coroutines.delay
 
 @Composable
 fun SplashScreen(
-    onNavigateToNext: () -> Unit
+    onNavigateToHome: () -> Unit,
+    onNavigateToOnboarding: () -> Unit,
+    onNavigateToLogin: () -> Unit,
+    viewModel: LaunchViewModel = hiltViewModel()
 ) {
     // Animaciones para el efecto de aparicion
     val alpha = remember { Animatable(0f) }
     val scale = remember { Animatable(0.8f) }
 
+    var animationFinished by remember { mutableStateOf(false) }
+
+    // Estado de autenticacion del ViewModel
+    val authState by viewModel.authState.collectAsState()
+
     LaunchedEffect(Unit) {
         // Delay inicial de 800ms (animation-delay del Figma)
         delay(800)
 
-        // Animación de entrada con ease-out de 800ms (animation-duration)
+        // Animacion de entrada con ease-out de 800ms (animation-duration)
         alpha.animateTo(
             targetValue = 1f,
             animationSpec = tween(
@@ -56,11 +70,30 @@ fun SplashScreen(
             )
         )
 
-        // Mostrar el splash por un momento antes de navegar
-        delay(1000)
+        animationFinished = true
+    }
 
-        // Navegar a la siguiente pantalla (1 - B - Launch segun Figma)
-        onNavigateToNext()
+    LaunchedEffect(animationFinished, authState) {
+        // La navegacion SÓLO procede si la animacion ha terminado Y el ViewModel ha retornado un estado.
+        if (animationFinished && authState != null) {
+            when (authState) {
+                CheckAuthState.AuthState.Authenticated -> {
+                    // Si esta autenticado, navega directamente a Home
+                    onNavigateToHome()
+                }
+                CheckAuthState.AuthState.Unauthenticated -> {
+                    // Si no esta autenticado (pero ya vio Onboarding), navega a Login
+                    onNavigateToLogin()
+                }
+                CheckAuthState.AuthState.OnboardingRequired -> {
+                    // Si necesita Onboarding, navega a OnboardingScreen
+                    onNavigateToOnboarding()
+                }
+                null -> {
+                    // Estado inicial de carga, no hacemos nada
+                }
+            }
+        }
     }
 
     Box(
@@ -77,7 +110,7 @@ fun SplashScreen(
                 scaleY = scale.value
             }
         ) {
-            // Icono solo (SVG del gráfico con flecha)
+            // Icono solo (SVG del grafico con flecha)
             Image(
                 painter = painterResource(id = R.drawable.ic_finwise_icon),
                 contentDescription = "FinWise Icon",
@@ -90,7 +123,7 @@ fun SplashScreen(
             // Texto "FinWise" separado
             Text(
                 text = "FinWise",
-                fontSize = 52.sp, // Según Figma: 52.14px
+                fontSize = 52.sp,
                 fontWeight = FontWeight.SemiBold, // Poppins SemiBold 600
                 color = Color(0xFFFFFFFF), // Color del texto: #FFFFFF (blanco)
                 letterSpacing = 0.sp
@@ -102,5 +135,9 @@ fun SplashScreen(
 @Preview(showBackground = true, widthDp = 430, heightDp = 932)
 @Composable
 fun SplashScreenPreview() {
-    SplashScreen(onNavigateToNext = {})
+    SplashScreen(
+        onNavigateToHome = {},
+        onNavigateToOnboarding = {},
+        onNavigateToLogin = {}
+    )
 }

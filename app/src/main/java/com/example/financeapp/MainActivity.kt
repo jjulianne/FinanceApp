@@ -19,8 +19,8 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.financeapp.ui.screens.LaunchScreen
-import com.example.financeapp.ui.screens.SplashScreen
+import com.example.financeapp.ui.screens.launch.OnboardingScreen
+import com.example.financeapp.ui.screens.launch.SplashScreen
 import com.example.financeapp.ui.theme.FinanceAppTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -44,47 +44,74 @@ class MainActivity : ComponentActivity() {
 fun AppNavigation() {
     val navController = rememberNavController()
 
+    // Rutas de destino
+    val SPLASH_ROUTE = "splash_screen"
+    val ONBOARDING_ROUTE = "onboarding_screen"
+    val LOGIN_ROUTE = "login_screen"
+    val HOME_ROUTE = "home_screen"
+    val DETAIL_ROUTE = "detail_screen"
+
     NavHost(
         navController = navController,
-        startDestination = "splash_screen" // Cambiado a splash como pantalla inicial
+        startDestination = SPLASH_ROUTE // Cambiado a splash como pantalla inicial
     ) {
         // Pantalla Splash (carga inicial)
-        composable(route = "splash_screen") {
+        composable(route = SPLASH_ROUTE) {
+            // El SplashScreen maneja 3 posibles destinos basados en el estado de Auth.
             SplashScreen(
-                onNavigateToNext = {
-                    navController.navigate("launch_screen") {
-                        // Eliminar splash del back stack para que no se pueda volver
-                        popUpTo("splash_screen") { inclusive = true }
+                // Navegacion a Home
+                onNavigateToHome = {
+                    navController.navigate(HOME_ROUTE) {
+                        popUpTo(SPLASH_ROUTE) { inclusive = true }
+                    }
+                },
+                // Navegacion a Onboarding (si es usuario nuevo)
+                onNavigateToOnboarding = {
+                    navController.navigate(ONBOARDING_ROUTE) {
+                        popUpTo(SPLASH_ROUTE) { inclusive = true }
+                    }
+                },
+                // Navegacion a Login (si ya hizo onboarding, pero no esta logueado)
+                onNavigateToLogin = {
+                    navController.navigate(LOGIN_ROUTE) {
+                        popUpTo(SPLASH_ROUTE) { inclusive = true }
                     }
                 }
             )
         }
 
-
-        // Pantalla Launch (Login/Sign Up)
-        composable(route = "launch_screen") {
-            LaunchScreen(
+        // Pantalla Onboarding
+        composable(route = ONBOARDING_ROUTE) {
+            OnboardingScreen(
                 onNavigateToLogin = {
-                    navController.navigate("login_screen")
+                    navController.navigate(LOGIN_ROUTE)
                 },
                 onNavigateToSignUp = {
-                    navController.navigate("signup_screen")
+                    navController.navigate("signup_screen") // Falta crear esta composable
                 },
                 onNavigateToForgotPassword = {
-                    navController.navigate("forgot_password_screen")
+                    navController.navigate("forgot_password_screen") // Falta crear esta composable
                 }
             )
         }
 
+        // Pantalla de Login (Deje por ahora la de HomeScreen para que se pueda navegar)
+        composable(route = LOGIN_ROUTE) {
+            HomeScreen(navController = navController)
+        }
+
+
         // Pantalla Home (principal)
-        composable(route = "home_screen") {
+        composable(route = HOME_ROUTE) {
             HomeScreen(navController = navController)
         }
 
         // Pantalla de detalle
-        composable(route = "detail_screen") {
+        composable(route = DETAIL_ROUTE) {
             DetailScreen(navController = navController)
         }
+
+        // Aca van mas rutas
     }
 }
 
