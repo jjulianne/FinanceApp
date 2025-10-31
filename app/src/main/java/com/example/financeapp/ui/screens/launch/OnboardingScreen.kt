@@ -1,4 +1,4 @@
-package com.example.financeapp.ui.screens
+package com.example.financeapp.ui.screens.launch
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -22,13 +22,10 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.financeapp.ui.theme.FinWiseDarkGreen
-import com.example.financeapp.ui.theme.FinWiseGreen
-import com.example.financeapp.ui.theme.FinWiseLightGreen
-import com.example.financeapp.ui.theme.FinWiseSecondaryGreen
+import com.example.financeApp.R
 
 @Composable
-fun LaunchScreen(
+fun OnboardingScreen(
     onNavigateToLogin: () -> Unit,
     onNavigateToSignUp: () -> Unit,
     onNavigateToForgotPassword: () -> Unit
@@ -40,7 +37,7 @@ fun LaunchScreen(
     ) {
         // Icono solo (grafico con flecha)
         Image(
-            painter = painterResource(id = com.example.financeApp.R.drawable.ic_finwise_icon),
+            painter = painterResource(id = R.drawable.ic_finwise_icon),
             contentDescription = "FinWise Icon",
             modifier = Modifier
                 .offset(x = 161.dp, y = 274.dp)
@@ -55,7 +52,7 @@ fun LaunchScreen(
             modifier = Modifier
                 .offset(x = 113.dp, y = 405.dp) // Ajusta segun necesites
                 .width(206.dp),
-            fontSize = 52.sp, // Segun Figma: 52.14px
+            fontSize = 52.sp,
             fontWeight = FontWeight.SemiBold, // Poppins SemiBold 600
             textAlign = TextAlign.Center,
             lineHeight = 57.sp,
@@ -135,7 +132,7 @@ fun LaunchScreen(
 @Preview(showBackground = true, widthDp = 430, heightDp = 932)
 @Composable
 fun LaunchScreenPreview() {
-    LaunchScreen(
+    OnboardingScreen(
         onNavigateToLogin = {},
         onNavigateToSignUp = {},
         onNavigateToForgotPassword = {}
