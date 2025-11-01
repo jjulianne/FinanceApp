@@ -25,7 +25,7 @@ import androidx.compose.ui.unit.sp
 import com.example.financeApp.R
 
 @Composable
-fun OnboardingScreen(
+fun WelcomeScreen(
     onNavigateToLogin: () -> Unit,
     onNavigateToSignUp: () -> Unit,
     onNavigateToForgotPassword: () -> Unit
@@ -132,7 +132,7 @@ fun OnboardingScreen(
 @Preview(showBackground = true, widthDp = 430, heightDp = 932)
 @Composable
 fun LaunchScreenPreview() {
-    OnboardingScreen(
+    WelcomeScreen(
         onNavigateToLogin = {},
         onNavigateToSignUp = {},
         onNavigateToForgotPassword = {}

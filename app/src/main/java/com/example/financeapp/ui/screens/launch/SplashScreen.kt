@@ -21,7 +21,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.painterResource
@@ -32,6 +31,9 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.financeApp.R
 import com.example.financeapp.domain.use_case.auth.CheckAuthState
+import com.example.financeapp.ui.theme.FinWiseDarkIcon
+import com.example.financeapp.ui.theme.FinWiseGreen
+import com.example.financeapp.ui.theme.FinWiseWhite
 import kotlinx.coroutines.delay
 
 @Composable
@@ -74,7 +76,7 @@ fun SplashScreen(
     }
 
     LaunchedEffect(animationFinished, authState) {
-        // La navegacion SÓLO procede si la animacion ha terminado Y el ViewModel ha retornado un estado.
+        // La navegacion SOLO procede si la animacion ha terminado Y el ViewModel ha retornado un estado
         if (animationFinished && authState != null) {
             when (authState) {
                 CheckAuthState.AuthState.Authenticated -> {
@@ -85,8 +87,8 @@ fun SplashScreen(
                     // Si no esta autenticado (pero ya vio Onboarding), navega a Login
                     onNavigateToLogin()
                 }
-                CheckAuthState.AuthState.OnboardingRequired -> {
-                    // Si necesita Onboarding, navega a OnboardingScreen
+                CheckAuthState.AuthState.WelcomeScreenRequired -> {
+                    // Si necesita Onboarding, navega a Onboarding1Screen
                     onNavigateToOnboarding()
                 }
                 null -> {
@@ -99,7 +101,7 @@ fun SplashScreen(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFF00D09E)), // background: #00D09E del Figma
+            .background(FinWiseGreen), // background: #00D09E del Figma
         contentAlignment = Alignment.Center
     ) {
         Column(
@@ -115,7 +117,7 @@ fun SplashScreen(
                 painter = painterResource(id = R.drawable.ic_finwise_icon),
                 contentDescription = "FinWise Icon",
                 modifier = Modifier.size(width = 109.dp, height = 115.dp),
-                colorFilter = ColorFilter.tint(Color(0xFF0E3E3E)) // Color del icono: #0E3E3E
+                colorFilter = ColorFilter.tint(FinWiseDarkIcon) // Color del icono: #0E3E3E
             )
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -125,7 +127,7 @@ fun SplashScreen(
                 text = "FinWise",
                 fontSize = 52.sp,
                 fontWeight = FontWeight.SemiBold, // Poppins SemiBold 600
-                color = Color(0xFFFFFFFF), // Color del texto: #FFFFFF (blanco)
+                color = FinWiseWhite, // Color del texto: #FFFFFF (blanco)
                 letterSpacing = 0.sp
             )
         }

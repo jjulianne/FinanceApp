@@ -9,8 +9,8 @@ class AuthRepositoryImpl @Inject constructor(
 ) : AuthRepository {
 
     // Falta implementar con Room - Por ahora retorna false para forzar onboarding
-    override suspend fun isOnboarded(): Boolean {
-        // return userSessionDao.getUserSession()?.isOnboarded ?: false
+    override suspend fun isWelcomed(): Boolean {
+        // return userSessionDao.getUserSession()?.isWelcomed ?: false
         return false
     }
 
