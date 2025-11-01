@@ -54,7 +54,7 @@ fun Onboarding1Screen(
             letterSpacing = 0.sp
         )
 
-        // Base Shape (seccion inferior con forma redondeada)
+        // Base Shape
         Box(
             modifier = Modifier
                 .offset(x = 1.dp, y = 308.dp)
@@ -64,7 +64,7 @@ fun Onboarding1Screen(
                 .background(Color(0xFFF1FFF3)) // #F1FFF3
         )
 
-        // eclipse (circulo de fondo)
+        // Circulo de fondo
         Box(
             modifier = Modifier
                 .offset(x = 99.dp, y = 443.dp)
@@ -73,7 +73,7 @@ fun Onboarding1Screen(
                 .background(Color(0xFFDFF7E2)) // #DFF7E2
         )
 
-        // Imagen de las monedas (coin)
+        // Coin
         Image(
             painter = painterResource(id = R.drawable.onboarding_coins),
             contentDescription = "Coins illustration",
@@ -82,7 +82,7 @@ fun Onboarding1Screen(
                 .size(287.dp)
         )
 
-        // Texto "Next" clickeable
+        // Next
         Box(
             modifier = Modifier
                 .offset(x = 181.dp, y = 758.dp)
@@ -100,7 +100,7 @@ fun Onboarding1Screen(
             )
         }
 
-        // Indicadores de pagina (dots)
+        // dots
         Row(
             modifier = Modifier
                 .offset(x = 194.dp, y = 807.dp)
