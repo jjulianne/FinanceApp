@@ -17,7 +17,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             FinanceAppTheme {
                 // 👇 Start directly on the Account Balance screen
-                FinWiseNavigation(startDestination = Screen.AccountBalance.route)
+                FinWiseNavigation(startDestination = Screen.Transactions.route)
             }
         }
     }
