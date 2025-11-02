@@ -15,6 +15,8 @@ import com.example.financeapp.ui.screens.launch.Onboarding1Screen
 import com.example.financeapp.ui.screens.launch.Onboarding2Screen
 import com.example.financeapp.ui.screens.launch.WelcomeScreen
 import com.example.financeapp.ui.screens.launch.SplashScreen
+import com.example.financeapp.ui.screens.balance.AccountBalanceScreen
+
 
 // Definicion de rutas de navegacion de la aplicacion
 sealed class Screen(val route: String) {
@@ -39,6 +41,8 @@ sealed class Screen(val route: String) {
     object Transactions : Screen("transactions_route")
     object Categories : Screen("categories_route")
     object SavingGoals : Screen("saving_goals_route")
+
+    object AccountBalance : Screen("account_balance_route")
 }
 
 @Composable
@@ -133,6 +137,12 @@ fun FinWiseNavigation(
         composable(Screen.SavingGoals.route) {
             PlaceholderScreen("Saving Goals Screen") // Falta la logica
         }
+
+        composable(Screen.AccountBalance.route) {
+            AccountBalanceScreen(navController = navController)
+        }
+
+
     }
 }
 

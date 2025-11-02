@@ -1,6 +1,6 @@
 [versions]
 # Versiones base
-agp = "8.12.2"
+agp = "8.12.3"
 kotlin = "2.1.10"
 
 # AndroidX principales

@@ -5,6 +5,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import com.example.financeapp.navigation.FinWiseNavigation
+import com.example.financeapp.navigation.Screen
 import com.example.financeapp.ui.theme.FinanceAppTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -15,8 +16,8 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             FinanceAppTheme {
-                // Usa el NavGraph centralizado
-                FinWiseNavigation()
+                // 👇 Start directly on the Account Balance screen
+                FinWiseNavigation(startDestination = Screen.AccountBalance.route)
             }
         }
     }
