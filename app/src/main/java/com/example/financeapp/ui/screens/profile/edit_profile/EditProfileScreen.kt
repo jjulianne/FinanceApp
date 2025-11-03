@@ -220,24 +220,27 @@ fun EditProfileScreen(
                 Spacer(modifier = Modifier.height(28.dp))
 
                 // Update Profile
-                Button(
-                    onClick = onUpdateProfile,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(46.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        // Usamos el color primario
-                        containerColor = MaterialTheme.colorScheme.primary
-                    ),
-                    shape = RoundedCornerShape(25.dp)
+                Box(
+                    modifier = Modifier.fillMaxWidth(),
+                    contentAlignment = Alignment.Center
                 ) {
-                    Text(
-                        text = "Update Profile",
-                        fontSize = 14.sp, // ajuste la font como el figma porque asi se veia toda la pantalla
-                        fontWeight = FontWeight.SemiBold,
-                        // Texto sobre el color primario
-                        color = MaterialTheme.colorScheme.onPrimary
-                    )
+                    Button(
+                        onClick = onUpdateProfile,
+                        modifier = Modifier
+                            .width(169.dp)
+                            .height(36.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = MaterialTheme.colorScheme.primary
+                        ),
+                        shape = RoundedCornerShape(25.dp)
+                    ) {
+                        Text(
+                            text = "Update Profile",
+                            fontSize = 14.sp,
+                            fontWeight = FontWeight.SemiBold,
+                            color = MaterialTheme.colorScheme.secondary
+                        )
+                    }
                 }
             }
         }
