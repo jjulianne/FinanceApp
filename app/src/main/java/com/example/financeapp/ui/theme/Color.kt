@@ -17,3 +17,29 @@ val FinWiseSecondaryGreen = Color(0xFFD4F1E8)  // Botón secundario
 val FinWiseDarkGreen = Color(0xFF2D5F5D)       // Textos oscuros
 val FinWiseDarkIcon = Color(0xFF0E3E3E)        // Icono en splash
 val FinWiseWhite = Color(0xFFFFFFFF)           // Blanco
+
+val CaribbeanGreen = Color(0xFF00D09E) // Primary
+val Honeydew = Color(0xFFF1FFF3)       // Light text / Light surface
+val LightGreen = Color(0xFFDFF7E2)       // Light surface variant
+val Cyprus = Color(0xFF0E3E3E)         // Dark surface / Light text
+val FenceGreen = Color(0xFF052224)       // Dark background
+val BackgroundDarkCard = Color(0xFF093030)  // Dark surface variant
+
+val FinWiseLightPrimary = CaribbeanGreen
+val FinWiseLightOnPrimary = Color.White
+val FinWiseLightBackground = CaribbeanGreen   // Fondo verde de la pantalla
+val FinWiseLightOnBackground = BackgroundDarkCard    // Texto del header sobre el fondo
+val FinWiseLightSurface = Honeydew            // Fondo de la "tarjeta" blanca
+val FinWiseLightOnSurface = Cyprus            // Texto ("Account Settings") sobre la tarjeta
+val FinWiseLightSurfaceVariant = LightGreen   // Fondo del TextField
+val FinWiseLightOnSurfaceVariant = Cyprus     // Texto dentro del TextField
+
+
+val FinWiseDarkPrimary = CaribbeanGreen         // El acento principal se mantiene
+val FinWiseDarkOnPrimary = Color.White
+val FinWiseDarkBackground = FenceGreen          // Fondo más oscuro para la pantalla
+val FinWiseDarkOnBackground = Honeydew          // Texto claro (header) sobre el fondo
+val FinWiseDarkSurface = Cyprus                 // Fondo de la "tarjeta" (más claro que el fondo)
+val FinWiseDarkOnSurface = Honeydew             // Texto claro ("Account Settings") sobre la tarjeta
+val FinWiseDarkSurfaceVariant = BackgroundDarkCard // Fondo del TextField
+val FinWiseDarkOnSurfaceVariant = Honeydew      // Texto claro dentro del TextField
