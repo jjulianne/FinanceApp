@@ -15,6 +15,14 @@ import com.example.financeapp.ui.screens.launch.Onboarding1Screen
 import com.example.financeapp.ui.screens.launch.Onboarding2Screen
 import com.example.financeapp.ui.screens.launch.WelcomeScreen
 import com.example.financeapp.ui.screens.launch.SplashScreen
+import com.example.financeapp.ui.screens.auth.LoginScreen
+import com.example.financeapp.ui.screens.auth.SignUpScreen
+import com.example.financeapp.ui.screens.auth.ForgotPasswordScreen
+import com.example.financeapp.ui.screens.auth.NewPasswordScreen
+import com.example.financeapp.ui.screens.auth.PasswordChangedSuccessScreen
+import com.example.financeapp.ui.screens.auth.SecurityPinScreen
+
+
 
 // Definicion de rutas de navegacion de la aplicacion
 sealed class Screen(val route: String) {
@@ -29,6 +37,10 @@ sealed class Screen(val route: String) {
     object Login : Screen("login_route")
     object SignUp : Screen("signup_route")
     object ForgotPassword : Screen("forgot_password_route")
+    object NewPassword : Screen("new_password_route")
+    object PasswordChangedSuccess : Screen("password_changed_success_route")
+
+
 
     // Rutas de Perfil y Configuración
     object Profile : Screen("profile_route")
@@ -44,7 +56,7 @@ sealed class Screen(val route: String) {
 @Composable
 fun FinWiseNavigation(
     navController: NavHostController = rememberNavController(),
-    startDestination: String = Screen.Splash.route
+    startDestination: String = Screen.Welcome.route
 ) {
     NavHost(
         navController = navController,
@@ -110,19 +122,90 @@ fun FinWiseNavigation(
                 }
             )
         }
-
         // Rutas de Autenticacion
+
+        //Login
         composable(Screen.Login.route) {
-            PlaceholderScreen("Login Screen") // Falta la logica
+            LoginScreen(
+                onNavigateToForgotPassword = {
+                    navController.navigate(Screen.ForgotPassword.route)
+                },
+                onNavigateToSignUp = {
+                    navController.navigate(Screen.SignUp.route)
+                },
+                onLogin = {
+                    navController.navigate(Screen.Home.route)
+                }
+            )
         }
 
+        //   pantalla de registro
         composable(Screen.SignUp.route) {
-            PlaceholderScreen("Sign Up Screen") // Falta la logica
+            SignUpScreen(
+                onNavigateToLogin = {
+                    navController.navigate(Screen.Login.route)
+                },
+                onSignUp = {
+                    // Cuando se registra con éxito, podrías llevarlo al home:
+                    navController.navigate(Screen.Home.route) {
+                        popUpTo(Screen.SignUp.route) { inclusive = true }
+                    }
+                }
+            )
         }
 
+// Pantalla Forgot Password
         composable(Screen.ForgotPassword.route) {
-            PlaceholderScreen("Forgot Password Screen") // Falta la logica
+            ForgotPasswordScreen(
+                onNavigateToLogin = {
+                    navController.navigate(Screen.Login.route)
+                },
+                onResetPassword = {
+                    // 👇 Cuando el usuario toca "Next step", lo mandamos al PIN screen
+                    navController.navigate(Screen.Security.route)
+                },
+                onNavigateToSignUp = {
+                    navController.navigate(Screen.SignUp.route)
+                }
+            )
         }
+        // Pantalla Security PIN
+        composable(Screen.Security.route) {
+            SecurityPinScreen(
+                onAccept = {
+                    navController.navigate(Screen.NewPassword.route)
+                },
+                onResend = {
+                    // Podrías mostrar un snackbar o repetir la acción de enviar PIN
+                },
+                onNavigateToSignUp = {
+                    navController.navigate(Screen.SignUp.route)
+                }
+            )
+        }
+// Pantalla New Password
+        composable(Screen.NewPassword.route) {
+            NewPasswordScreen(
+                onChangePassword = {
+                    navController.navigate(Screen.PasswordChangedSuccess.route)
+                },
+                onNavigateToLogin = {
+                    navController.navigate(Screen.Login.route)
+                }
+            )
+        }
+
+// Pantalla de confirmación de cambio de contraseña
+        composable(Screen.PasswordChangedSuccess.route) {
+            PasswordChangedSuccessScreen(
+                onNavigateToLogin = {
+                    navController.navigate(Screen.Login.route) {
+                        popUpTo(Screen.PasswordChangedSuccess.route) { inclusive = true }
+                    }
+                }
+            )
+        }
+
 
         // Pantallas principales (ejemplo)
         composable(Screen.Home.route) {
@@ -135,6 +218,7 @@ fun FinWiseNavigation(
         }
     }
 }
+
 
 // Pantalla temporal de placeholder
 @Composable
