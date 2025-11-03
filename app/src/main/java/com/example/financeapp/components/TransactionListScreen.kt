@@ -24,7 +24,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.financeapp.core.* // Import data/constants
 import com.example.financeApp.R
-// You'll need to define your BottomNavBar logic separately if it's external
+import com.example.financeapp.ui.theme.* // Importamos los colores de FinWise
 
 // =========================================================================
 // MAIN REUSABLE SCREEN COMPONENT
@@ -40,7 +40,7 @@ fun TransactionListScreen(
     Scaffold(
         // Assuming BottomNavBar is here, uncomment when ready:
         bottomBar = { BottomNavBar(navController = navController) },
-        containerColor = GreenPrimary
+        containerColor = FinWiseGreen // Usamos FinWiseGreen
     ) { padding ->
         Column(
             modifier = Modifier
@@ -60,7 +60,7 @@ fun TransactionListScreen(
                 modifier = Modifier
                     .fillMaxSize()
                     .clip(RoundedCornerShape(topStart = 32.dp, topEnd = 32.dp))
-                    .background(WhiteBackground)
+                    .background(FinWiseWhite) // Usamos FinWiseWhite
                     .padding(horizontal = 16.dp)
                     .offset(y = (-20).dp) // Adjust based on image
             ) {
@@ -112,7 +112,7 @@ fun CustomHeader(
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp)
+            .padding(horizontal = 24.dp) // Ajuste el padding para centrar
             .padding(top = 8.dp, bottom = 16.dp)
     ) {
         // --- Custom Top Bar ---
@@ -121,29 +121,29 @@ fun CustomHeader(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Icon(Icons.Filled.ArrowBack, contentDescription = "Back", tint = Color.White,
+            Icon(Icons.Filled.ArrowBack, contentDescription = "Back", tint = FinWiseWhite,
                 modifier = Modifier.size(28.dp).clickable { navController.popBackStack() }
             )
-            Text(content.title, color = Color.White, fontWeight = FontWeight.SemiBold, fontSize = 18.sp)
-            Icon(painterResource(id = R.drawable.notif_green), contentDescription = "Notifications", tint = Color.White, modifier = Modifier.size(24.dp))
+            Text(content.title, color = FinWiseWhite, fontWeight = FontWeight.SemiBold, fontSize = 18.sp)
+            Icon(painterResource(id = R.drawable.notif_green), contentDescription = "Notifications", tint = FinWiseWhite, modifier = Modifier.size(24.dp))
         }
 
         // --- Total Balance Card ---
         Card(
             shape = RoundedCornerShape(12.dp),
             modifier = Modifier.fillMaxWidth().padding(vertical = 12.dp),
-            colors = CardDefaults.cardColors(containerColor = Color.White)
+            colors = CardDefaults.cardColors(containerColor = FinWiseWhite) // Usamos FinWiseWhite
         ) {
             Text(
                 "Total Balance",
-                color = GreyText,
+                color = FinWiseDarkGreen, // Usamos FinWiseDarkGreen
                 fontSize = 14.sp,
                 textAlign = TextAlign.Center,
                 modifier = Modifier.fillMaxWidth().padding(top = 8.dp)
             )
             Text(
                 content.totalBalance,
-                color = Color.Black,
+                color = Void, // Usamos Void
                 fontWeight = FontWeight.Bold,
                 fontSize = 24.sp,
                 textAlign = TextAlign.Center,
@@ -159,18 +159,16 @@ fun CustomHeader(
             // Income Block
             SummaryBlockCard(
                 title = "Income", amount = content.incomeAmount, iconResId = R.drawable.income_light_green,
-                // If Income is GreenPrimary, it's the active (white background) card
-                active = content.activeCardColor == GreenPrimary,
-                activeColor = content.activeCardColor, passiveColor = content.passiveCardColor,
+                active = content.activeCardColor == FinWiseGreen, // Usamos FinWiseGreen
+                activeColor = FinWiseGreen, passiveColor = FinWiseDarkGreen, // Colores FinWise
                 modifier = Modifier.weight(1f).clickable(onClick = onIncomeClick)
             )
             Spacer(Modifier.width(16.dp))
             // Expense Block
             SummaryBlockCard(
                 title = "Expense", amount = content.expenseAmount, iconResId = R.drawable.expense_blue,
-                // If Expense is BlueExpense, it's the active (white background) card
-                active = content.activeCardColor == BlueExpense,
-                activeColor = content.activeCardColor, passiveColor = content.passiveCardColor,
+                active = content.activeCardColor == LightBlue, // Usamos LightBlue
+                activeColor = LightBlue, passiveColor = FinWiseDarkGreen, // Colores FinWise
                 modifier = Modifier.weight(1f).clickable(onClick = onExpenseClick)
             )
         }
@@ -183,10 +181,10 @@ fun SummaryBlockCard(
     activeColor: Color, passiveColor: Color, modifier: Modifier = Modifier
 ) {
     // Determine the color scheme based on the active state
-    val blockColor = if (active) activeColor else Color.White
-    val textColor = if (active) Color.Black else Color.White
-    val amountColor = if (active) activeColor else Color.White
-    val backgroundColor = if (active) Color.White else blockColor.copy(alpha = 0.5f)
+    val blockColor = if (active) activeColor else FinWiseDarkGreen // Usamos FinWiseDarkGreen
+    val textColor = if (active) FinWiseDarkGreen else FinWiseWhite // Texto oscuro si activo, blanco si pasivo
+    val amountColor = if (active) FinWiseDarkGreen else FinWiseWhite // Monto oscuro si activo, blanco si pasivo
+    val backgroundColor = if (active) FinWiseWhite else blockColor.copy(alpha = 0.5f) // Fondo blanco si activo, verde oscuro semi-transparente si pasivo
 
     Card(
         shape = RoundedCornerShape(20.dp),
@@ -221,87 +219,3 @@ fun SummaryBlockCard(
     }
 }
 
-@Composable
-fun MonthHeader(month: String) {
-    Row(
-        modifier = Modifier.fillMaxWidth().padding(vertical = 12.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween
-    ) {
-        Text(month, fontWeight = FontWeight.Bold, fontSize = 18.sp, color = Color.Black)
-        Icon(
-            painterResource(id = R.drawable.calendar),
-            contentDescription = "Calendar",
-            tint = GreenPrimary,
-            modifier = Modifier.size(24.dp)
-        )
-    }
-}
-
-@Composable
-fun TransactionItem(
-    iconResId: Int, title: String, dateAndTime: String, category: String, amount: String, amountColor: Color
-) {
-    Card(
-        shape = RoundedCornerShape(16.dp),
-        modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
-        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 12.dp, horizontal = 16.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            // Icon Column
-            Box(
-                modifier = Modifier
-                    .size(54.dp)
-                    .clip(RoundedCornerShape(16.dp))
-                    .background(BlueExpense.copy(alpha = 0.1f))
-                    .padding(8.dp),
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(
-                    painterResource(id = iconResId),
-                    contentDescription = title,
-                    tint = BlueExpense,
-                    modifier = Modifier.size(30.dp)
-                )
-            }
-            Spacer(Modifier.width(16.dp))
-
-            // Details Column (Title and Date)
-            Column(modifier = Modifier.width(120.dp)) {
-                Text(title, fontWeight = FontWeight.SemiBold, fontSize = 16.sp)
-                Text(dateAndTime, fontSize = 12.sp, color = BlueExpense)
-            }
-
-            // Category Column (Separator with Text)
-            Row(
-                modifier = Modifier.weight(1f),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Center
-            ) {
-                Divider(
-                    color = BlueExpense.copy(alpha = 0.2f),
-                    modifier = Modifier.height(30.dp).width(1.dp)
-                )
-                Spacer(Modifier.width(12.dp))
-                Text(category, fontSize = 14.sp, color = GreyText, textAlign = TextAlign.Center)
-                Spacer(Modifier.width(12.dp))
-            }
-
-            // Amount Column
-            Text(
-                amount,
-                color = amountColor,
-                fontWeight = FontWeight.Bold,
-                fontSize = 16.sp,
-                modifier = Modifier.width(80.dp),
-                textAlign = TextAlign.End
-            )
-        }
-    }
-}

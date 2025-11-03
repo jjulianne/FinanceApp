@@ -11,46 +11,60 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.financeapp.components.BottomNavBar
+import com.example.financeapp.ui.screens.balance.AccountBalanceScreen
 import com.example.financeapp.ui.screens.launch.Onboarding1Screen
 import com.example.financeapp.ui.screens.launch.Onboarding2Screen
-import com.example.financeapp.ui.screens.launch.WelcomeScreen
 import com.example.financeapp.ui.screens.launch.SplashScreen
-import com.example.financeapp.ui.screens.transactions.TransactionsScreen
+import com.example.financeapp.ui.screens.launch.WelcomeScreen
 import com.example.financeapp.ui.screens.transactions.ExpenseScreen
 import com.example.financeapp.ui.screens.transactions.IncomeScreen
+import com.example.financeapp.ui.screens.transactions.TransactionsScreen
+import com.example.financeApp.R // Assuming this R import is correct
+
+// --- Sealed class for Bottom Navigation Items (Used by BottomNavBar) ---
+sealed class BottomNavItem(val route: String, val icon: Int, val label: String) {
+    object Home : BottomNavItem("home_route", R.drawable.home_nav, "Home")
+    object Stats : BottomNavItem("stats_route", R.drawable.analysis_nav, "Stats")
+    object Transfer : BottomNavItem("transfer_route", R.drawable.transaction_nav, "Transfer")
+    object Wallet : BottomNavItem("wallet_route", R.drawable.category_nav, "Wallet")
+    object Profile : BottomNavItem("profile_route", R.drawable.profile_nav, "Profile")
+}
 
 
-// Definicion de rutas de navegacion de la aplicacion
+// --- Application Screen Routes ---
 sealed class Screen(val route: String) {
     // Rutas de Inicio (Launch)
     object Splash : Screen("splash_route")
-    object Onboarding1 : Screen("onboarding1_route")         // Primera pantalla de onboarding
-    object Onboarding2 : Screen("onboarding2_route")         // Segunda pantalla de onboarding
-    object Welcome : Screen("welcome_route")                 // Pantalla de bienvenida (Log In / Sign Up)
-    object Home : Screen("home_route")                       // Pantalla principal
+    object Onboarding1 : Screen("onboarding1_route")
+    object Onboarding2 : Screen("onboarding2_route")
+    object Welcome : Screen("welcome_route")
 
-    // Rutas de Autenticación (Auth)
+    // Rutas de Features principales
+    object Home : Screen(BottomNavItem.Home.route) // AccountBalanceScreen
+    object Transactions : Screen(BottomNavItem.Transfer.route) // TransactionsScreen
+    object Categories : Screen("categories_route")
+    object SavingGoals : Screen("saving_goals_route")
+
+    // Rutas de Autenticación
     object Login : Screen("login_route")
     object SignUp : Screen("signup_route")
     object ForgotPassword : Screen("forgot_password_route")
 
+    // Rutas de Filtros de Transactions
+    object Income : Screen("income_route")
+    object Expense : Screen("expense_route")
+
     // Rutas de Perfil y Configuración
-    object Profile : Screen("profile_route")
+    object ProfileRoute : Screen(BottomNavItem.Profile.route)
     object Settings : Screen("settings_route")
     object Security : Screen("security_route")
-
-    // Rutas de Features principales
-    object Transactions : Screen("transactions_route")
-    object Categories : Screen("categories_route")
-    object SavingGoals : Screen("saving_goals_route")
-
-
 }
 
 @Composable
 fun FinWiseNavigation(
     navController: NavHostController = rememberNavController(),
-    startDestination: String = Screen.Splash.route
+    startDestination: String = Screen.Home.route
 ) {
     NavHost(
         navController = navController,
@@ -58,10 +72,6 @@ fun FinWiseNavigation(
     ) {
         // Pantalla Splash (inicial)
         composable(Screen.Splash.route) {
-            // El SplashScreen decide el destino segun el estado de autenticacion:
-            // - Home (si ya esta autenticado)
-            // - Onboarding (si es la primera vez)
-            // - Login (si no esta autenticado, pero ya vio onboarding)
             SplashScreen(
                 onNavigateToHome = {
                     navController.navigate(Screen.Home.route) {
@@ -81,77 +91,48 @@ fun FinWiseNavigation(
             )
         }
 
-        // Pantalla Onboarding 1 (Welcome To Expense Manager)
-        composable(Screen.Onboarding1.route) {
-            Onboarding1Screen(
-                onNext = {
-                    navController.navigate(Screen.Onboarding2.route)
-                }
-            )
-        }
-
-        // Pantalla Onboarding 2 (Are You Ready To Take Control Of Your Finances?)
-        composable(Screen.Onboarding2.route) {
-            Onboarding2Screen(
-                onNext = {
-                    navController.navigate(Screen.Welcome.route)
-                },
-                onBack = {
-                    navController.popBackStack()
-                }
-            )
-        }
-
-        // Pantalla Welcome (Log In / Sign Up)
+        // Pantallas Onboarding y Welcome
+        composable(Screen.Onboarding1.route) { Onboarding1Screen(onNext = { navController.navigate(Screen.Onboarding2.route) }) }
+        composable(Screen.Onboarding2.route) { Onboarding2Screen(onNext = { navController.navigate(Screen.Welcome.route) }, onBack = { navController.popBackStack() }) }
         composable(Screen.Welcome.route) {
             WelcomeScreen(
-                onNavigateToLogin = {
-                    navController.navigate(Screen.Login.route)
-                },
-                onNavigateToSignUp = {
-                    navController.navigate(Screen.SignUp.route)
-                },
-                onNavigateToForgotPassword = {
-                    navController.navigate(Screen.ForgotPassword.route)
-                }
+                onNavigateToLogin = { navController.navigate(Screen.Login.route) },
+                onNavigateToSignUp = { navController.navigate(Screen.SignUp.route) },
+                onNavigateToForgotPassword = { navController.navigate(Screen.ForgotPassword.route) }
             )
         }
 
         // Rutas de Autenticacion
-        composable(Screen.Login.route) {
-            PlaceholderScreen("Login Screen") // Falta la logica
-        }
+        composable(Screen.Login.route) { PlaceholderScreen("Login Screen") }
+        composable(Screen.SignUp.route) { PlaceholderScreen("Sign Up Screen") }
+        composable(Screen.ForgotPassword.route) { PlaceholderScreen("Forgot Password Screen") }
 
-        composable(Screen.SignUp.route) {
-            PlaceholderScreen("Sign Up Screen") // Falta la logica
-        }
-
-        composable(Screen.ForgotPassword.route) {
-            PlaceholderScreen("Forgot Password Screen") // Falta la logica
-        }
-
-        // Pantallas principales (ejemplo)
+        // Pantallas Principales
         composable(Screen.Home.route) {
-            PlaceholderScreen("Home Screen") // Falta la logica
-        }
-
-        // Aca van mas pantallas (ejemplo)
-        composable(Screen.SavingGoals.route) {
-            PlaceholderScreen("Saving Goals Screen") // Falta la logica
+            AccountBalanceScreen(navController)
         }
 
         composable(Screen.Transactions.route) {
             TransactionsScreen(navController = navController)
         }
-        composable("expense_route") {
+
+        // Pantallas de Filtro
+        composable(Screen.Expense.route) {
             ExpenseScreen(navController)
         }
-
-        composable("income_route") {
+        composable(Screen.Income.route) {
             IncomeScreen(navController)
         }
 
+        // Mapeo de otros items del BottomNav
+        composable(BottomNavItem.Stats.route) { PlaceholderScreen("Stats Screen") }
+        composable(Screen.Categories.route) { PlaceholderScreen("Categories Screen") } // Assuming Wallet/Categories
+        composable(Screen.ProfileRoute.route) { PlaceholderScreen("Profile Screen") }
 
+        // Otras Rutas
+        composable(Screen.SavingGoals.route) { PlaceholderScreen("Saving Goals Screen") }
+        composable(Screen.Settings.route) { PlaceholderScreen("Settings Screen") }
+        composable(Screen.Security.route) { PlaceholderScreen("Security Screen") }
     }
 }
 

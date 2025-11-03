@@ -1,4 +1,4 @@
-package com.example.financeapp.components // Package remains 'components'
+package com.example.financeapp.components
 
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -16,27 +16,20 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.res.painterResource
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
+import com.example.financeapp.navigation.BottomNavItem
 import com.example.financeApp.R
+import androidx.compose.foundation.shape.RoundedCornerShape
+import com.example.financeapp.ui.theme.*
+import androidx.compose.foundation.background
+import androidx.compose.ui.Alignment
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.size
+import androidx.compose.ui.draw.clip
 
-/**
- * Sealed class to define all possible bottom navigation items and their associated properties.
- */
-sealed class BottomNavItem(val route: String, val icon: Int, val label: String) {
-    // 1. Home (Maps to home_nav.xml)
-    object Home : BottomNavItem("home_route", R.drawable.home_nav, "Home")
-    // 2. Stats / Analysis (Maps to analysis_nav.xml)
-    object Stats : BottomNavItem("stats_route", R.drawable.analysis_nav, "Stats")
-    // 3. Transfer / Exchange (Maps to transaction_nav.xml)
-    object Transfer : BottomNavItem("transfer_route", R.drawable.transaction_nav, "Transfer")
-    // 4. Wallet / Savings (Maps to category_nav.xml)
-    object Wallet : BottomNavItem("wallet_route", R.drawable.category_nav, "Wallet")
-    // 5. Profile / Account (Maps to profile_route", R.drawable.profile_nav, "Profile")
-    object Profile : BottomNavItem("profile_route", R.drawable.profile_nav, "Profile")
-}
 
 @Composable
-fun BottomNavBar(navController: NavController) { // FIX: Renamed function to BottomNavBar
-    // 1. Define the list of all items
+fun BottomNavBar(navController: NavController) {
     val items = listOf(
         BottomNavItem.Home,
         BottomNavItem.Stats,
@@ -45,69 +38,69 @@ fun BottomNavBar(navController: NavController) { // FIX: Renamed function to Bot
         BottomNavItem.Profile,
     )
 
-    // Used to observe the current route to determine which item is selected
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
 
-    // Define the routes that belong to the bottom bar for easy checking
     val bottomBarRoutes = items.map { it.route }
-
-    // Find the currently selected item route by matching against the known bottom bar routes
     val selectedRoute = items.find { it.route == currentRoute }?.route
 
-    // Use Surface for the background and rounded corners to match the design
+    // El Surface principal de la BottomNavBar ahora usa FinWiseLightGreen
+    // Las esquinas blancas alrededor de este Surface se manejarán en el Scaffold o en un Box envolvente.
     Surface(
-        // The background color of the bar itself (looks light gray/white in the image)
-        color = MaterialTheme.colorScheme.surface,
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 8.dp, vertical = 4.dp),
-        shape = MaterialTheme.shapes.extraLarge // Use a large shape for rounded corners
+        color = FinWiseLightGreen, // Fondo verde claro de la barra
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(topStart = 32.dp, topEnd = 32.dp) // Solo esquinas superiores redondeadas
     ) {
         NavigationBar(
-            // Set the background color of the NavigationBar transparent
-            containerColor = Color.Transparent,
-            tonalElevation = 0.dp // Remove default shadow
+            containerColor = Color.Transparent, // El color lo da el Surface padre
+            tonalElevation = 0.dp,
+            modifier = Modifier.height(72.dp)
         ) {
             items.forEach { item ->
-                // Check if the current route matches the item's route
                 val isSelected = selectedRoute == item.route
 
+                val indicatorColor = if (item.route == BottomNavItem.Transfer.route) {
+                    if (isSelected) FinWiseGreen else Color.Transparent
+                } else {
+                    Color.Transparent
+                }
+
+                val iconColor = if (isSelected) FinWiseWhite else FinWiseDarkGreen
+
                 NavigationBarItem(
-                    // Set the click action
                     onClick = {
-                        // Navigate to the new destination only if it's not the current one
                         if (currentRoute != item.route) {
                             navController.navigate(item.route) {
-                                // Important: Pop up to the start destination of the bottom bar graph
                                 popUpTo(bottomBarRoutes.first()) {
                                     saveState = true
                                 }
-                                // Avoid multiple copies of the same destination when reselecting the same item
                                 launchSingleTop = true
-                                // Restore state when reselecting a previously selected item
                                 restoreState = true
                             }
                         }
                     },
                     selected = isSelected,
                     icon = {
-                        Icon(
-                            // Now uses painterResource to load the custom XML drawable
-                            painter = painterResource(id = item.icon),
-                            contentDescription = item.label,
-                            modifier = Modifier.padding(vertical = 4.dp)
-                        )
+                        Box(
+                            modifier = Modifier
+                                .size(48.dp)
+                                .clip(RoundedCornerShape(12.dp))
+                                .background(indicatorColor),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Icon(
+                                painter = painterResource(id = item.icon),
+                                contentDescription = item.label,
+                                tint = if (item.route == BottomNavItem.Transfer.route && isSelected) FinWiseWhite else iconColor,
+                                modifier = Modifier.size(24.dp)
+                            )
+                        }
                     },
-                    // We don't need the label text for this specific design
                     label = null,
-                    // Define the colors for the item states
                     colors = NavigationBarItemDefaults.colors(
-                        // The primary color from your design (the bright green)
-                        selectedIconColor = Color(0xFF1ABC9C),
-                        // A dark, slightly transparent gray for inactive icons
-                        unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
-                        indicatorColor = Color.Transparent // No background indicator needed
+                        selectedIconColor = Color.Transparent,
+                        unselectedIconColor = Color.Transparent,
+                        indicatorColor = Color.Transparent
                     )
                 )
             }
