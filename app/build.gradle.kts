@@ -68,10 +68,9 @@ dependencies {
     implementation(libs.hilt.navigation.compose)
 
     // INYECCION DE DEPENDENCIAS (HILT)
-    implementation(libs.hilt)           // Biblioteca principal de Hilt
+    implementation(libs.hilt)
     implementation(libs.androidx.navigation.runtime.ktx)
-    implementation(libs.androidx.compose.foundation.layout)
-    implementation(libs.androidx.datastore.preferences)
+    implementation(libs.androidx.foundation.layout)           // Biblioteca principal de Hilt
     ksp(libs.hilt.compiler)             // Procesador de anotaciones de Hilt (KSP)
 
     // PERSISTENCIA DE DATOS (ROOM)
