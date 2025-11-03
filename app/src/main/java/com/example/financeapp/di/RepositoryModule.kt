@@ -1,7 +1,9 @@
 package com.example.financeapp.di
 
 import com.example.financeapp.data.repository.AuthRepositoryImpl
+import com.example.financeapp.data.repository.SettingsRepositoryImpl
 import com.example.financeapp.domain.repository.AuthRepository
+import com.example.financeapp.domain.repository.SettingsRepository
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -22,6 +24,12 @@ abstract class RepositoryModule {
     abstract fun bindAuthRepository(
         authRepositoryImpl: AuthRepositoryImpl
     ): AuthRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindSettingsRepository(
+        impl: SettingsRepositoryImpl
+    ): SettingsRepository
 
     // Aca van los binds para TransactionRepository,
     // ProfileRepository, SavingRepository, etc., a medida que los implemente.
