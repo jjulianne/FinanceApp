@@ -19,6 +19,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -55,11 +56,10 @@ fun HelpScreen(
                 onNavigateToProfile = onNavigateToProfile
             )
         }
-    ) { paddingValues ->
+    ) { _ -> // Antes tenia un padding el cual borre porque sino me tiraba la pantalla para abajo
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(paddingValues)
                 .background(MaterialTheme.colorScheme.background)
         ) {
             // Header
@@ -185,7 +185,12 @@ private fun FAQContent(
         // Filtros de categoría
         Row(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
+            horizontalArrangement = Arrangement.spacedBy(
+                space = 8.dp,
+                alignment = Alignment.CenterHorizontally
+            ),
+
+            verticalAlignment = Alignment.CenterVertically
         ) {
             CategoryChip("General", selectedCategory == "General") { onCategoryChange("General") }
             CategoryChip("Account", selectedCategory == "Account") { onCategoryChange("Account") }
@@ -293,7 +298,8 @@ private fun CategoryChip(
             text = text,
             fontSize = 14.sp,
             fontWeight = FontWeight.Medium,
-            color = MaterialTheme.colorScheme.onSurface
+            color = MaterialTheme.colorScheme.onSurface,
+            textAlign = TextAlign.Center
         )
     }
 }

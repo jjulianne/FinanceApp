@@ -2,10 +2,12 @@ package com.example.financeapp.ui.screens.help
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.financeapp.domain.repository.Chat
 import com.example.financeapp.domain.repository.ChatRepository
 import com.example.financeapp.ui.screens.help.OnlineSupportUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
@@ -33,12 +35,15 @@ class OnlineSupportViewModel @Inject constructor(
                 initialValue = OnlineSupportUiState(isLoading = true) // Estado inicial de carga
             )
 
+    private val _events = MutableSharedFlow<OnlineSupportEvent>()
+    val events = _events.asSharedFlow()
     /**
      * Llamado al presionar "Start Another Chat".
-     * (Simulación, no hace nada por ahora).
      */
     fun onStartAnotherChatClicked() {
-        // En una app real, esto podría navegar a una pantalla
-        // de chat activa o mostrar un formulario de contacto.
+        // 3. ¡Ahora sí hace algo! Emite el evento.
+        viewModelScope.launch {
+            _events.emit(OnlineSupportEvent.NavigateToNewChat)
+        }
     }
 }

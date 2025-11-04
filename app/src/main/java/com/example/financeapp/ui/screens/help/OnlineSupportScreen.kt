@@ -11,6 +11,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -33,6 +34,7 @@ fun OnlineSupportScreen(
     currentRoute: String = "profile_route",
     viewModel: OnlineSupportViewModel = hiltViewModel(),
     onNavigateBack: () -> Unit = {},
+    onNavigateToChat: (String) -> Unit = {},
     onNavigateToHome: () -> Unit = {},
     onNavigateToAnalysis: () -> Unit = {},
     onNavigateToTransactions: () -> Unit = {},
@@ -40,6 +42,16 @@ fun OnlineSupportScreen(
     onNavigateToProfile: () -> Unit = {}
 ) {
     val state by viewModel.uiState.collectAsState()
+
+    LaunchedEffect(key1 = true) {
+        viewModel.events.collect { event ->
+            when (event) {
+                is OnlineSupportEvent.NavigateToNewChat -> {
+                    onNavigateToChat("new")
+                }
+            }
+        }
+    }
 
     Scaffold(
         bottomBar = {
@@ -84,18 +96,17 @@ fun OnlineSupportScreen(
                     // Columna con scroll para el contenido
                     Column(
                         modifier = Modifier
-                            .weight(1f)
                             .verticalScroll(rememberScrollState()) // Permite scroll
                             .padding(horizontal = 32.dp)
                     ) {
                         // Sección de Chats Activos
                         SectionTitle("Active Chats")
-                        Spacer(modifier = Modifier.height(16.dp))
+                        Spacer(modifier = Modifier.height(12.dp))
                         if (state.activeChats.isEmpty() && !state.isLoading) {
                             Text(
                                 text = "No active chats",
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                modifier = Modifier.padding(bottom = 24.dp)
+                                modifier = Modifier.padding(bottom = 14.dp)
                             )
                         } else {
                             state.activeChats.forEach { chat ->
@@ -104,17 +115,17 @@ fun OnlineSupportScreen(
                                     title = chat.title,
                                     subtitle = chat.lastMessage,
                                     timestamp = chat.timestamp,
-                                    onClick = { /* TODO: Navegar al chat */ }
+                                    onClick = { onNavigateToChat(chat.title) }
                                 )
-                                Spacer(modifier = Modifier.height(12.dp))
+                                Spacer(modifier = Modifier.height(8.dp))
                             }
                         }
 
-                        Spacer(modifier = Modifier.height(16.dp)) // Espacio entre secciones
+                        Spacer(modifier = Modifier.height(12.dp)) // Espacio entre secciones
 
                         // Sección de Chats Terminados
                         SectionTitle("Ended Chats")
-                        Spacer(modifier = Modifier.height(16.dp))
+                        Spacer(modifier = Modifier.height(12.dp))
                         if (state.endedChats.isEmpty() && !state.isLoading) {
                             Text(
                                 text = "No ended chats",
@@ -127,14 +138,14 @@ fun OnlineSupportScreen(
                                     title = chat.title,
                                     subtitle = chat.lastMessage,
                                     timestamp = chat.timestamp,
-                                    onClick = { /* TODO: Navegar al chat */ }
+                                    onClick = { onNavigateToChat(chat.title) }
                                 )
-                                Spacer(modifier = Modifier.height(12.dp))
+                                Spacer(modifier = Modifier.height(8.dp))
                             }
                         }
                     } // Fin de la Column con scroll
 
-                    // Botón "Start Another Chat"
+                    // Boton "Start Another Chat"
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -144,8 +155,8 @@ fun OnlineSupportScreen(
                         Button(
                             onClick = viewModel::onStartAnotherChatClicked,
                             modifier = Modifier
-                                .fillMaxWidth()
-                                .height(48.dp),
+                                .width(220.dp)
+                                .height(44.dp),
                             colors = ButtonDefaults.buttonColors(
                                 containerColor = MaterialTheme.colorScheme.primary
                             ),

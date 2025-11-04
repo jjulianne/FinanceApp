@@ -10,3 +10,10 @@ data class OnlineSupportUiState(
     val endedChats: List<Chat> = emptyList(),
     val isLoading: Boolean = true
 )
+
+/**
+ * Eventos de una sola vez para la pantalla de soporte online.
+ */
+sealed class OnlineSupportEvent {
+    object NavigateToNewChat : OnlineSupportEvent()
+}

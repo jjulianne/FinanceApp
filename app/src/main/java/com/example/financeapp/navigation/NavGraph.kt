@@ -8,9 +8,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.example.financeapp.ui.screens.launch.Onboarding1Screen
 import com.example.financeapp.ui.screens.launch.Onboarding2Screen
 import com.example.financeapp.ui.screens.launch.WelcomeScreen
@@ -23,6 +25,7 @@ import com.example.financeapp.ui.screens.settings.PasswordSettingsScreen
 import com.example.financeapp.ui.screens.settings.DeleteAccountScreen
 import com.example.financeapp.ui.screens.help.HelpScreen
 import com.example.financeapp.ui.screens.help.OnlineSupportScreen
+import com.example.financeapp.ui.screens.help.SupportChatScreen
 
 
 // Definicion de rutas de navegacion de la aplicacion
@@ -58,6 +61,11 @@ sealed class Screen(val route: String) {
 
     object Help : Screen("help_route")
     object OnlineSupport : Screen("online_support_route")
+    object SupportChat : Screen("support_chat_route/{chatId}") {
+        fun withArgs(chatId: String): String {
+            return "support_chat_route/$chatId"
+        }
+    }
 }
 
 @Composable
@@ -312,12 +320,40 @@ fun FinWiseNavigation(
                 currentRoute = Screen.Profile.route, // Mantiene Profile seleccionado
                 onNavigateBack = { navController.popBackStack() },
 
+                onNavigateToChat = { chatId ->
+                    navController.navigate(Screen.SupportChat.withArgs(chatId))
+                },
+
                 // Callbacks del BottomNavBar
                 onNavigateToHome = {
                     navController.navigate(Screen.Home.route) {
                         popUpTo(navController.graph.startDestinationRoute!!) { saveState = true }
                     }
                 },
+                onNavigateToAnalysis = { /* Falta implementar */ },
+                onNavigateToTransactions = { /* Falta implementar */ },
+                onNavigateToCategory = { /* Falta implementar */ },
+                onNavigateToProfile = { navController.navigate(Screen.Profile.route) }
+            )
+        }
+
+        composable(
+            route = Screen.SupportChat.route, // Usa la plantilla "support_chat_route/{chatId}"
+            arguments = listOf(
+                navArgument("chatId") {
+                    type = NavType.StringType
+                    nullable = true
+                    defaultValue = null
+                }
+            )
+        ) {
+            SupportChatScreen(
+                darkTheme = isDarkTheme,
+                currentRoute = Screen.Profile.route, // Mantiene Profile seleccionado
+                onNavigateBack = { navController.popBackStack() },
+
+                // Callbacks del BottomNavBar
+                onNavigateToHome = { navController.navigate(Screen.Home.route) { popUpTo(navController.graph.startDestinationRoute!!) { saveState = true } } },
                 onNavigateToAnalysis = { /* Falta implementar */ },
                 onNavigateToTransactions = { /* Falta implementar */ },
                 onNavigateToCategory = { /* Falta implementar */ },
