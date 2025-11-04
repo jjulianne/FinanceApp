@@ -1,12 +1,17 @@
 package com.example.financeapp.domain.repository
 
+import com.example.financeapp.domain.model.User
+
 interface AuthRepository {
 
-    // Metodo para verificar si el usuario ha completado el Onboarding
     suspend fun isWelcomed(): Boolean
-
-    // Metodo para verificar si hay una sesion de usuario activa (token valido, etc.)
     suspend fun isUserLoggedIn(): Boolean
 
-    // Aca iria la logica del login
+    // Nuevo método: login con credenciales
+    suspend fun login(email: String, password: String): User
+
+    suspend fun logout()
+
+    suspend fun createUser(username: String, email: String, password: String): User
+
 }
