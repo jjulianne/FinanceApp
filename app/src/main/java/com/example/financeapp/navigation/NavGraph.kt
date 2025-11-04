@@ -7,6 +7,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -21,6 +22,7 @@ import com.example.financeapp.ui.screens.auth.ForgotPasswordScreen
 import com.example.financeapp.ui.screens.auth.NewPasswordScreen
 import com.example.financeapp.ui.screens.auth.PasswordChangedSuccessScreen
 import com.example.financeapp.ui.screens.auth.SecurityPinScreen
+import com.example.financeapp.ui.screens.home.HomeScreen
 
 
 
@@ -141,7 +143,14 @@ fun FinWiseNavigation(
                     navController.navigate(Screen.SignUp.route)
                 },
                 onLogin = {
-                    navController.navigate(Screen.Home.route) //ACA VA HOME
+                    navController.navigate(Screen.Home.route) {
+                        // Primero se limpia  el stack de navegacion para que Home sea la nueva raiz
+                        popUpTo(navController.graph.findStartDestination().id) {
+                            inclusive = true
+                        }
+                        // Aseguramos que solo haya una instancia de Home
+                        launchSingleTop = true
+                    }
                 }
             )
         }
@@ -153,9 +162,13 @@ fun FinWiseNavigation(
                     navController.navigate(Screen.Login.route)
                 },
                 onSignUp = {
-                    // Cuando se registra con éxito, podrías llevarlo al home:
                     navController.navigate(Screen.Home.route) {
-                        popUpTo(Screen.SignUp.route) { inclusive = true }
+                        // Primero se limpia  el stack de navegacion para que Home sea la nueva raiz
+                        popUpTo(navController.graph.findStartDestination().id) {
+                            inclusive = true
+                        }
+                        // Aseguramos que solo haya una instancia de Home
+                        launchSingleTop = true
                     }
                 }
             )
@@ -227,7 +240,7 @@ fun FinWiseNavigation(
 
         // Pantallas principales (ejemplo)
         composable(Screen.Home.route) {
-            PlaceholderScreen("Home Screen") // Falta la logica
+            HomeScreen(navController = navController)
         }
 
         // Aca van mas pantallas (ejemplo)
