@@ -1,5 +1,6 @@
 package com.example.financeapp.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.financeapp.domain.repository.AuthRepository
@@ -36,6 +37,9 @@ class AuthViewModel @Inject constructor(
 
                 val user = authRepository.login(email, password)
 
+                Log.d("AUTH_VIEWMODEL", "Usuario logueado: $email")
+
+
                 // Si llegó hasta acá, el login fue exitoso
                 _isLoggedIn.value = true
                 _isLoading.value = false
@@ -47,13 +51,33 @@ class AuthViewModel @Inject constructor(
         }
     }
 
+
+    fun createUser(username: String, email: String, password: String) {
+        viewModelScope.launch {
+            try {
+                _isLoading.value = true
+                _errorMessage.value = null
+
+                val user = authRepository.createUser(username, email, password)
+
+                _isLoggedIn.value = true
+            } catch (e: Exception) {
+                _errorMessage.value = e.message
+            } finally {
+                _isLoading.value = false
+            }
+        }
+    }
+
+
     /**
      * Cierra sesión (opcional)
      */
     fun logout() {
         viewModelScope.launch {
-            // Si tu repo tiene método logout, llamalo acá
+            authRepository.logout() // 🔹 borra la sesión en Room
             _isLoggedIn.value = false
         }
     }
+
 }

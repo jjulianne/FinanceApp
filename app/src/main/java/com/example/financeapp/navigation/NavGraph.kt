@@ -31,7 +31,9 @@ sealed class Screen(val route: String) {
     object Onboarding1 : Screen("onboarding1_route")         // Primera pantalla de onboarding
     object Onboarding2 : Screen("onboarding2_route")         // Segunda pantalla de onboarding
     object Welcome : Screen("welcome_route")                 // Pantalla de bienvenida (Log In / Sign Up)
-    object Home : Screen("home_route")                       // Pantalla principal
+    object Home : Screen("home_route")
+    object Logout : Screen("logout_route")
+// Pantalla principal
 
     // Rutas de Autenticación (Auth)
     object Login : Screen("login_route")
@@ -39,6 +41,8 @@ sealed class Screen(val route: String) {
     object ForgotPassword : Screen("forgot_password_route")
     object NewPassword : Screen("new_password_route")
     object PasswordChangedSuccess : Screen("password_changed_success_route")
+
+
 
 
 
@@ -56,12 +60,15 @@ sealed class Screen(val route: String) {
 @Composable
 fun FinWiseNavigation(
     navController: NavHostController = rememberNavController(),
-    startDestination: String = Screen.Splash.route
+    startDestination: String = Screen.Security.route
 ) {
     NavHost(
         navController = navController,
         startDestination = startDestination
     ) {
+
+
+
         // Pantalla Splash (inicial)
         composable(Screen.Splash.route) {
             // El SplashScreen decide el destino segun el estado de autenticacion:
@@ -134,7 +141,7 @@ fun FinWiseNavigation(
                     navController.navigate(Screen.SignUp.route)
                 },
                 onLogin = {
-                    navController.navigate(Screen.Home.route)
+                    navController.navigate(Screen.Home.route) //ACA VA HOME
                 }
             )
         }
@@ -205,6 +212,17 @@ fun FinWiseNavigation(
                 }
             )
         }
+
+        composable(Screen.PasswordChangedSuccess.route) {
+            PasswordChangedSuccessScreen(
+                onNavigateToLogin = {
+                    navController.navigate(Screen.Login.route) {
+                        popUpTo(Screen.PasswordChangedSuccess.route) { inclusive = true }
+                    }
+                }
+            )
+        }
+
 
 
         // Pantallas principales (ejemplo)

@@ -47,7 +47,7 @@ fun AuthScreenLayout(
             modifier = Modifier
                 .fillMaxSize()
                 .clip(RoundedCornerShape(topStart = 60.dp, topEnd = 60.dp)) // ✅ recorta esquinas
-                .background(Color(0xFFF5FFF6)) // ✅ aplica color después del clip
+                .background(Color(0xFFF6FFF9)) // ✅ aplica color después del clip
                 .padding(horizontal = 32.dp, vertical = 24.dp)
         ) {
             Column(

@@ -10,8 +10,19 @@ data class LoginRequest(
 
 // Datos que devuelve el backend/mockapi al loguear correctamente
 data class LoginResponse(
-    val userId: String,
-    val name: String,
-    val email: String,
-    val token: String? = null // opcional
+    val token: String,
 )
+
+data class CreateUserRequest(
+    val id: Int,
+    val username: String,
+    val email: String,
+    val password: String
+)
+
+data class CreateUserResponse(
+    val id: Int,
+    val email: String,
+    val username: String
+)
+

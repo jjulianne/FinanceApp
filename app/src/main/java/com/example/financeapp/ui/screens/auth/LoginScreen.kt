@@ -22,7 +22,6 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun LoginScreen(
-
     onNavigateToForgotPassword: () -> Unit = {},
     onNavigateToSignUp: () -> Unit = {},
     onLogin: () -> Unit = {},
@@ -46,15 +45,17 @@ fun LoginScreen(
 
     AuthScreenLayout(title = "Welcome") {
 
-        // 📧 Campo Username / Email
+        Spacer(modifier = Modifier.height(30.dp))
+
+        // ✉️ Campo Username / Email
         AppTextField(
             value = email,
             onValueChange = { email = it },
-            label = "Username or Email",
-            placeholder = "example@email.com"
+            label = "Username Or Email",
+            placeholder = "example@example.com"
         )
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(25.dp))
 
         // 🔒 Campo Password
         AppPasswordField(
@@ -64,7 +65,7 @@ fun LoginScreen(
             placeholder = "••••••••"
         )
 
-        Spacer(modifier = Modifier.height(24.dp))
+        Spacer(modifier = Modifier.height(35.dp))
 
         // 🟢 Botón Log In
         AppButton(
@@ -77,7 +78,7 @@ fun LoginScreen(
             }
         )
 
-        // 🔴 Mensaje de error (si falla el login)
+        // ⚠️ Mensaje de error (si falla el login)
         if (!errorMessage.isNullOrEmpty()) {
             Spacer(modifier = Modifier.height(8.dp))
             Text(
@@ -88,7 +89,7 @@ fun LoginScreen(
             )
         }
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(12.dp))
 
         // 🔗 Forgot Password
         AppTextButton(
@@ -96,17 +97,17 @@ fun LoginScreen(
             onClick = onNavigateToForgotPassword
         )
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(18.dp))
 
-        // 🟩 Botón Sign Up (versión clara)
-        AppButton(
+        // 🔷 Botón “Sign Up”
+        AppOutlinedButton(
             text = "Sign Up",
             onClick = onNavigateToSignUp
         )
 
         Spacer(modifier = Modifier.height(30.dp))
 
-        // 🖐️ Fingerprint Text
+        // 🧩 Texto de huella
         Text(
             text = "Use Fingerprint To Access",
             color = FinWiseDarkGreen,
@@ -115,7 +116,7 @@ fun LoginScreen(
             textAlign = TextAlign.Center
         )
 
-        Spacer(modifier = Modifier.height(30.dp))
+        Spacer(modifier = Modifier.height(40.dp))
 
         // 🌐 Sección de redes sociales
         AuthSocialSection(
