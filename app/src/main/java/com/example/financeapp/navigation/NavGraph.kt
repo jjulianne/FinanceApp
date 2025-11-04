@@ -264,16 +264,6 @@ fun FinWiseNavigation(
                 darkTheme = isDarkTheme,
                 currentRoute = Screen.Profile.route, // Mantiene Profile seleccionado en navbar
                 onNavigateBack = { navController.popBackStack() },
-                onDeleteAccount = { password ->
-                    // Falta validar contrasenia y eliminar cuenta con Room
-                    // Luego navegar al login o splash
-                    navController.navigate(Screen.Login.route) {
-                        popUpTo(0) { inclusive = true } // Limpia toda la pila de navegacion
-                    }
-                },
-                onCancel = {
-                    navController.popBackStack()
-                },
 
                 // Callbacks del BottomNavBar
                 onNavigateToHome = {

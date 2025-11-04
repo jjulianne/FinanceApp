@@ -3,6 +3,8 @@ package com.example.financeapp.ui.screens.settings
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.financeapp.domain.repository.AuthRepository
+import com.example.financeapp.ui.screens.settings.PasswordSettingsEvent
+import com.example.financeapp.ui.screens.settings.PasswordSettingsUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -12,21 +14,6 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-data class PasswordSettingsUiState(
-    val currentPassword: String = "",
-    val newPassword: String = "",
-    val confirmPassword: String = "",
-    val isCurrentPasswordVisible: Boolean = false,
-    val isNewPasswordVisible: Boolean = false,
-    val isConfirmPasswordVisible: Boolean = false,
-    val isLoading: Boolean = false,
-    val errorMessage: String? = null,
-    val showSuccess: Boolean = false
-)
-
-sealed class PasswordSettingsEvent {
-    object NavigateBack : PasswordSettingsEvent()
-}
 
 @HiltViewModel
 class PasswordSettingsViewModel @Inject constructor(

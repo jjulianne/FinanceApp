@@ -13,12 +13,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.financeapp.components.AppHeader
 import com.example.financeapp.components.BottomNavBar
 import com.example.financeapp.ui.theme.FinanceAppTheme
 
 @Composable
 fun NotificationSettingsScreen(
+    viewModel: NotificationSettingsViewModel = hiltViewModel(),
     darkTheme: Boolean,
     currentRoute: String = "profile_route",
     onNavigateBack: () -> Unit = {},
@@ -28,15 +30,8 @@ fun NotificationSettingsScreen(
     onNavigateToCategory: () -> Unit = {},
     onNavigateToProfile: () -> Unit = {}
 ) {
-    // Estados para los toggles de notificaciones
-    var generalNotification by remember { mutableStateOf(true) }
-    var sound by remember { mutableStateOf(true) }
-    var soundCall by remember { mutableStateOf(true) }
-    var vibrate by remember { mutableStateOf(true) }
-    var transactionUpdate by remember { mutableStateOf(false) }
-    var expenseReminder by remember { mutableStateOf(false) }
-    var budgetNotifications by remember { mutableStateOf(false) }
-    var lowBalanceAlerts by remember { mutableStateOf(false) }
+    val state by viewModel.uiState.collectAsState()
+
 
     Scaffold(
         bottomBar = {
@@ -50,10 +45,11 @@ fun NotificationSettingsScreen(
                 onNavigateToProfile = onNavigateToProfile
             )
         }
-    ) { _ ->
+    ) { paddingValues ->
         Box(
             modifier = Modifier
                 .fillMaxSize()
+                .padding(paddingValues)
                 // Usamos el color de fondo principal
                 .background(MaterialTheme.colorScheme.background)
         ) {
@@ -75,69 +71,73 @@ fun NotificationSettingsScreen(
                     .background(MaterialTheme.colorScheme.surface)
             )
 
-            // Lista de opciones de notificaciones
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .offset(y = 160.dp)
-                    .padding(horizontal = 32.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
-                // General Notification
-                NotificationToggleRow(
-                    label = "General Notification",
-                    checked = generalNotification,
-                    onCheckedChange = { generalNotification = it }
-                )
+            if (!state.isLoading) {
+                // Lista de opciones de notificaciones
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .offset(y = 160.dp)
+                        .padding(horizontal = 32.dp),
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    // General Notification
+                    NotificationToggleRow(
+                        label = "General Notification",
+                        checked = state.generalNotification,
+                        onCheckedChange = viewModel::onGeneralNotificationChanged
+                    )
 
-                // Sound
-                NotificationToggleRow(
-                    label = "Sound",
-                    checked = sound,
-                    onCheckedChange = { sound = it }
-                )
+                    // Sound
+                    NotificationToggleRow(
+                        label = "Sound",
+                        checked = state.sound,
+                        onCheckedChange = viewModel::onSoundChanged
+                    )
 
-                // Sound Call
-                NotificationToggleRow(
-                    label = "Sound Call",
-                    checked = soundCall,
-                    onCheckedChange = { soundCall = it }
-                )
+                    // Sound Call
+                    NotificationToggleRow(
+                        label = "Sound Call",
+                        checked = state.soundCall,
+                        onCheckedChange = viewModel::onSoundCallChanged
+                    )
 
-                // Vibrate
-                NotificationToggleRow(
-                    label = "Vibrate",
-                    checked = vibrate,
-                    onCheckedChange = { vibrate = it }
-                )
+                    // Vibrate
+                    NotificationToggleRow(
+                        label = "Vibrate",
+                        checked = state.vibrate,
+                        onCheckedChange = viewModel::onVibrateChanged
+                    )
 
-                // Transaction Update
-                NotificationToggleRow(
-                    label = "Transaction Update",
-                    checked = transactionUpdate,
-                    onCheckedChange = { transactionUpdate = it }
-                )
+                    // Transaction Update
+                    NotificationToggleRow(
+                        label = "Transaction Update",
+                        checked = state.transactionUpdate,
+                        onCheckedChange = viewModel::onTransactionUpdateChanged
+                    )
 
-                // Expense Reminder
-                NotificationToggleRow(
-                    label = "Expense Reminder",
-                    checked = expenseReminder,
-                    onCheckedChange = { expenseReminder = it }
-                )
+                    // Expense Reminder
+                    NotificationToggleRow(
+                        label = "Expense Reminder",
+                        checked = state.expenseReminder,
+                        onCheckedChange = viewModel::onExpenseReminderChanged
+                    )
 
-                // Budget Notifications
-                NotificationToggleRow(
-                    label = "Budget Notifications",
-                    checked = budgetNotifications,
-                    onCheckedChange = { budgetNotifications = it }
-                )
+                    // Budget Notifications
+                    NotificationToggleRow(
+                        label = "Budget Notifications",
+                        checked = state.budgetNotifications,
+                        onCheckedChange = viewModel::onBudgetNotificationsChanged
+                    )
 
-                // Low Balance Alerts
-                NotificationToggleRow(
-                    label = "Low Balance Alerts",
-                    checked = lowBalanceAlerts,
-                    onCheckedChange = { lowBalanceAlerts = it }
-                )
+                    // Low Balance Alerts
+                    NotificationToggleRow(
+                        label = "Low Balance Alerts",
+                        checked = state.lowBalanceAlerts,
+                        onCheckedChange = viewModel::onLowBalanceAlertsChanged
+                    )
+                }
+            } else {
+                CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
             }
         }
     }
