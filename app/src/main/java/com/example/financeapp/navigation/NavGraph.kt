@@ -8,18 +8,22 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.example.financeapp.ui.screens.launch.Onboarding1Screen
 import com.example.financeapp.ui.screens.launch.Onboarding2Screen
 import com.example.financeapp.ui.screens.launch.WelcomeScreen
 import com.example.financeapp.ui.screens.launch.SplashScreen
 import com.example.financeapp.ui.screens.profile.ProfileScreen
 import com.example.financeapp.ui.screens.profile.edit_profile.EditProfileScreen
+import com.example.financeapp.ui.screens.security.AddFingerprintScreen
 import com.example.financeapp.ui.screens.security.SecurityScreen
 import com.example.financeapp.ui.screens.security.ChangePinScreen
 import com.example.financeapp.ui.screens.security.FingerprintScreen
+import com.example.financeapp.ui.screens.security.FingerprintDetailScreen
 import com.example.financeapp.ui.screens.security.TermsAndConditionsScreen
 
 
@@ -43,6 +47,17 @@ sealed class Screen(val route: String) {
     object Security : Screen("security_route")
     object ChangePin : Screen("change_pin_route")                   // Cambiar PIN
     object Fingerprint : Screen("fingerprint_route")                // Configurar huella
+
+    // Usamos "{fingerprintName}" para pasar el nombre como argumento en la URL.
+    object FingerprintDetail : Screen("fingerprint_detail_route/{fingerprintName}") {
+        // Funcion helper para construir la ruta con el argumento
+        fun withArgs(name: String): String {
+            return "fingerprint_detail_route/$name"
+        }
+    }
+
+    object AddFingerprint : Screen("add_fingerprint_route")         // Añadir huella
+
     object TermsAndConditions : Screen("terms_conditions_route")    // Términos y condiciones
     object Settings : Screen("settings_route")
 
@@ -223,10 +238,6 @@ fun FinWiseNavigation(
                 darkTheme = isDarkTheme,
                 currentRoute = Screen.Profile.route, // Mantiene Profile seleccionado en navbar
                 onNavigateBack = { navController.popBackStack() },
-                onChangePin = {
-                    // TODO: Guardar nuevo PIN en el backend/Room
-                    navController.popBackStack()
-                },
 
                 // Callbacks del BottomNavBar
                 onNavigateToHome = {
@@ -248,11 +259,61 @@ fun FinWiseNavigation(
                 currentRoute = Screen.Profile.route, // Mantiene Profile seleccionado en navbar
                 onNavigateBack = { navController.popBackStack() },
                 onViewFingerprint = {
-                    // Falta implementar
-                },
+                        fingerprintName -> navController.navigate(Screen.FingerprintDetail.withArgs(fingerprintName))
+                                    },
                 onAddFingerprint = {
-                    // Falta implementar
+                    navController.navigate(Screen.AddFingerprint.route)
                 },
+
+                // Callbacks del BottomNavBar
+                onNavigateToHome = {
+                    navController.navigate(Screen.Home.route) {
+                        popUpTo(navController.graph.startDestinationRoute!!) { saveState = true }
+                    }
+                },
+                onNavigateToAnalysis = { /* Falta implementar */ },
+                onNavigateToTransactions = { /* Falta implementar */ },
+                onNavigateToCategory = { /* Falta implementar */ },
+                onNavigateToProfile = { navController.navigate(Screen.Profile.route) }
+            )
+        }
+
+        composable(
+            route = Screen.FingerprintDetail.route,
+            arguments = listOf(navArgument("fingerprintName") { type = NavType.StringType })
+        ) {
+            // El ViewModel se inyecta automaticamente usando hilt
+            // y obtiene 'fingerprintName' del SavedStateHandle.
+
+            FingerprintDetailScreen(
+                darkTheme = isDarkTheme,
+                currentRoute = Screen.Profile.route, // Mantiene Profile seleccionado en navbar
+                onNavigateBack = { navController.popBackStack() },
+
+                // El ViewModel se encarga de la logica y nos avisa
+                // cuando debe navegar hacia atras
+                onDeleteSuccess = {
+                    navController.popBackStack()
+                },
+
+                // Callbacks del BottomNavBar
+                onNavigateToHome = {
+                    navController.navigate(Screen.Home.route) {
+                        popUpTo(navController.graph.startDestinationRoute!!) { saveState = true }
+                    }
+                },
+                onNavigateToAnalysis = { /* Falta implementar */ },
+                onNavigateToTransactions = { /* Falta implementar */ },
+                onNavigateToCategory = { /* Falta implementar */ },
+                onNavigateToProfile = { navController.navigate(Screen.Profile.route) }
+            )
+        }
+
+        composable(Screen.AddFingerprint.route) {
+            AddFingerprintScreen(
+                darkTheme = isDarkTheme,
+                currentRoute = Screen.Profile.route, // Mantiene Profile seleccionado en navbar
+                onNavigateBack = { navController.popBackStack() },
 
                 // Callbacks del BottomNavBar
                 onNavigateToHome = {

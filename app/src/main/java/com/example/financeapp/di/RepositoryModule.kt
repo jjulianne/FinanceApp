@@ -1,8 +1,10 @@
 package com.example.financeapp.di
 
 import com.example.financeapp.data.repository.AuthRepositoryImpl
+import com.example.financeapp.data.repository.FingerprintRepositoryImpl
 import com.example.financeapp.data.repository.SettingsRepositoryImpl
 import com.example.financeapp.domain.repository.AuthRepository
+import com.example.financeapp.domain.repository.FingerprintRepository
 import com.example.financeapp.domain.repository.SettingsRepository
 import dagger.Binds
 import dagger.Module
@@ -30,6 +32,12 @@ abstract class RepositoryModule {
     abstract fun bindSettingsRepository(
         impl: SettingsRepositoryImpl
     ): SettingsRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindFingerprintRepository(
+        impl: FingerprintRepositoryImpl
+    ): FingerprintRepository
 
     // Aca van los binds para TransactionRepository,
     // ProfileRepository, SavingRepository, etc., a medida que los implemente.

@@ -28,7 +28,7 @@ fun FingerprintScreen(
     darkTheme: Boolean,
     currentRoute: String = "profile_route",
     onNavigateBack: () -> Unit = {},
-    onViewFingerprint: () -> Unit = {},
+    onViewFingerprint: (String) -> Unit = {},
     onAddFingerprint: () -> Unit = {},
     onNavigateToHome: () -> Unit = {},
     onNavigateToAnalysis: () -> Unit = {},
@@ -83,7 +83,7 @@ fun FingerprintScreen(
                     icon = R.drawable.fingerprints,
                     text = "John Fingerprint",
                     iconBackgroundColor = Color(0xFF6DB6FE),
-                    onClick = onViewFingerprint
+                    onClick = { onViewFingerprint("John Fingerprint") }
                 )
 
                 Spacer(modifier = Modifier.height(20.dp))
