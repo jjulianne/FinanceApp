@@ -37,7 +37,11 @@ navigationTesting = "2.9.5"
 hiltTesting = "2.57.2"
 coroutinesTest = "1.10.2"
 navigationRuntimeKtx = "2.9.5"
+uiText = "1.9.4"
 foundationLayout = "1.9.4"
+material3 = "1.4.0"
+uiGraphics = "1.9.4"
+foundation = "1.9.4"
 
 
 [libraries]
@@ -90,6 +94,10 @@ truth = { group = "com.google.truth", name = "truth", version.ref = "truth" }
 runner = { group = "androidx.test", name = "runner", version.ref = "runner" }
 androidx-navigation-runtime-ktx = { group = "androidx.navigation", name = "navigation-runtime-ktx", version.ref = "navigationRuntimeKtx" }
 androidx-foundation-layout = { group = "androidx.compose.foundation", name = "foundation-layout", version.ref = "foundationLayout" }
+androidx-ui-text = { group = "androidx.compose.ui", name = "ui-text", version.ref = "uiText" }
+material3 = { group = "androidx.compose.material3", name = "material3", version.ref = "material3" }
+ui-graphics = { group = "androidx.compose.ui", name = "ui-graphics", version.ref = "uiGraphics" }
+androidx-foundation = { group = "androidx.compose.foundation", name = "foundation", version.ref = "foundation" }
 
 
 [plugins]
