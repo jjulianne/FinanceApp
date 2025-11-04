@@ -66,11 +66,10 @@ fun DeleteAccountScreen(
                 onNavigateToProfile = onNavigateToProfile
             )
         }
-    ) { paddingValues ->
+    ) { _ -> // Antes tenia un padding el cual borre porque sino me tiraba la pantalla para abajo
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(paddingValues)
                 // Usamos el color de fondo principal
                 .background(MaterialTheme.colorScheme.background)
         ) {
