@@ -8,6 +8,8 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -18,6 +20,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.financeApp.R
 import com.example.financeapp.components.AppHeader
 import com.example.financeapp.components.BottomNavBar
@@ -25,6 +28,7 @@ import com.example.financeapp.ui.theme.FinanceAppTheme
 
 @Composable
 fun FingerprintScreen(
+    viewModel: FingerprintViewModel = hiltViewModel(),
     darkTheme: Boolean,
     currentRoute: String = "profile_route",
     onNavigateBack: () -> Unit = {},
@@ -36,6 +40,8 @@ fun FingerprintScreen(
     onNavigateToCategory: () -> Unit = {},
     onNavigateToProfile: () -> Unit = {}
 ) {
+    val uiState by viewModel.uiState.collectAsState()
+
     Scaffold(
         bottomBar = {
             BottomNavBar(
@@ -48,10 +54,11 @@ fun FingerprintScreen(
                 onNavigateToProfile = onNavigateToProfile
             )
         }
-    ) { _ ->
+    ) { paddingValues ->
         Box(
             modifier = Modifier
                 .fillMaxSize()
+                .padding(paddingValues)
                 .background(MaterialTheme.colorScheme.background)
         ) {
             // Header
@@ -71,34 +78,67 @@ fun FingerprintScreen(
                     .background(MaterialTheme.colorScheme.surface)
             )
 
-            // Contenido principal
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .offset(y = 175.dp)
-                    .padding(horizontal = 38.dp)
-            ) {
-                // John Fingerprint
-                FingerprintMenuItem(
-                    icon = R.drawable.fingerprints,
-                    text = "John Fingerprint",
-                    iconBackgroundColor = Color(0xFF6DB6FE),
-                    onClick = { onViewFingerprint("John Fingerprint") }
-                )
-
-                Spacer(modifier = Modifier.height(20.dp))
-
-                // Add A Fingerprint
-                FingerprintMenuItem(
-                    icon = R.drawable.more,
-                    text = "Add A Fingerprint",
-                    iconBackgroundColor = Color(0xFF6DB6FE),
-                    onClick = onAddFingerprint
-                )
+            when (val state = uiState) {
+                is FingerprintUiState.Loading -> {
+                    CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+                }
+                is FingerprintUiState.Success -> {
+                    // Contenido principal (solo se muestra en estado Success)
+                    FingerprintContent(
+                        fingerprints = state.fingerprints,
+                        onViewFingerprint = onViewFingerprint,
+                        onAddFingerprint = onAddFingerprint
+                    )
+                }
+                is FingerprintUiState.Error -> {
+                    Text(
+                        text = state.message,
+                        color = MaterialTheme.colorScheme.error,
+                        modifier = Modifier
+                            .align(Alignment.Center)
+                            .padding(horizontal = 38.dp)
+                    )
+                }
             }
         }
     }
 }
+
+/**
+ * Contenido principal (la lista de items)
+ */
+@Composable
+private fun FingerprintContent(
+    fingerprints: List<String>,
+    onViewFingerprint: (String) -> Unit,
+    onAddFingerprint: () -> Unit
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .offset(y = 175.dp)
+            .padding(horizontal = 38.dp)
+    ) {
+        fingerprints.forEach { fingerprintName ->
+            FingerprintMenuItem(
+                icon = R.drawable.fingerprints,
+                text = fingerprintName,
+                iconBackgroundColor = Color(0xFF6DB6FE),
+                onClick = { onViewFingerprint(fingerprintName) } // Pasa el nombre
+            )
+            Spacer(modifier = Modifier.height(20.dp))
+        }
+
+        // Add A Fingerprint (siempre se muestra)
+        FingerprintMenuItem(
+            icon = R.drawable.more,
+            text = "Add A Fingerprint",
+            iconBackgroundColor = Color(0xFF6DB6FE),
+            onClick = onAddFingerprint
+        )
+    }
+}
+
 
 /**
  * Item del menu de huella digital con icono y flecha
@@ -167,6 +207,6 @@ private fun FingerprintMenuItem(
 @Composable
 fun FingerprintScreenPreview() {
     FinanceAppTheme(darkTheme = false) { // Cambia a 'true' para probar modo oscuro
-        FingerprintScreen(darkTheme = false) // Cambia a 'true' para probar modo oscuro
+        FingerprintScreen(darkTheme = false)
     }
 }

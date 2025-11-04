@@ -4,6 +4,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.financeapp.domain.repository.FingerprintRepository
+import com.example.financeapp.ui.screens.security.FingerprintDetailState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -12,12 +13,6 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-
-data class FingerprintDetailState(
-    val fingerprintName: String = "",
-    val isLoading: Boolean = false,
-    val showSuccess: Boolean = false
-)
 
 @HiltViewModel
 class FingerprintDetailViewModel @Inject constructor(

@@ -3,6 +3,8 @@ package com.example.financeapp.ui.screens.security
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.financeapp.domain.repository.SettingsRepository
+import com.example.financeapp.ui.screens.security.AddFingerprintEvent
+import com.example.financeapp.ui.screens.security.AddFingerprintUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -13,15 +15,6 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-data class AddFingerprintUiState(
-    val isLoading: Boolean = false,    // Para deshabilitar el boton mientras "escanea"
-    val showSuccess: Boolean = false   // Para mostrar el LoadingScreen de exito
-    // val errorMessage: String? = null // Podriamos aniadir esto para futuros errores
-)
-
-sealed class AddFingerprintEvent {
-    object NavigateBack : AddFingerprintEvent() // Comando para volver a la pantalla anterior
-}
 
 @HiltViewModel
 class AddFingerprintViewModel @Inject constructor(
