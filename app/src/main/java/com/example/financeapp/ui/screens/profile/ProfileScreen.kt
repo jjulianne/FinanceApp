@@ -7,12 +7,19 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -24,6 +31,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 import com.example.financeApp.R
 import com.example.financeapp.components.BottomNavBar
 import com.example.financeapp.components.AppHeader
@@ -45,6 +53,8 @@ fun ProfileScreen(
     onNavigateToCategory: () -> Unit = {},
     onNavigateToProfile: () -> Unit = {},
 ) {
+    var showLogoutDialog by remember { mutableStateOf(false) }
+
     Scaffold(
         bottomBar = {
             BottomNavBar(
@@ -176,7 +186,19 @@ fun ProfileScreen(
                     icon = R.drawable.logout,
                     text = "Logout",
                     backgroundColor = Color(0xFF3299FF),
-                    onClick = onLogout
+                    onClick = { showLogoutDialog = true } // <-- Ahora muestra el popup
+                )
+            }
+
+            if (showLogoutDialog) {
+                LogoutConfirmationDialog(
+                    onConfirm = {
+                        showLogoutDialog = false
+                        onLogout() // Llama a la acción original de logout
+                    },
+                    onCancel = {
+                        showLogoutDialog = false // Simplemente cierra el popup
+                    }
                 )
             }
         }
@@ -234,13 +256,115 @@ private fun ProfileMenuItem(
 }
 
 
+/**
+ * Popup de confirmación para cerrar sesión (Logout).
+ */
+@Composable
+private fun LogoutConfirmationDialog(
+    onConfirm: () -> Unit,
+    onCancel: () -> Unit
+) {
+    // Dialog proporciona el fondo oscurecido (scrim) automaticamente
+    Dialog(onDismissRequest = onCancel) {
+        Card(
+            shape = RoundedCornerShape(24.dp), // Esquinas redondeadas como en la imagen
+            colors = CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.surface // Fondo de la tarjeta
+            ),
+            modifier = Modifier.width(300.dp) // Ancho aproximado de la imagen
+        ) {
+            Column(
+                modifier = Modifier
+                    .padding(horizontal = 24.dp, vertical = 32.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
+                // Titulo
+                Text(
+                    text = "End Session",
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    textAlign = TextAlign.Center
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                // Subtitulo
+                Text(
+                    text = "Are you sure you want to log out?",
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Normal,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    textAlign = TextAlign.Center
+                )
+
+                Spacer(modifier = Modifier.height(28.dp))
+
+                // Boton "Yes, End Session"
+                Button(
+                    onClick = onConfirm,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(48.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        // Usamos el color primario del tema (verde)
+                        containerColor = MaterialTheme.colorScheme.primary
+                    ),
+                    shape = RoundedCornerShape(25.dp)
+                ) {
+                    Text(
+                        text = "Yes, End Session",
+                        fontSize = 15.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        // Usamos el color secundario (blanco/claro)
+                        color = MaterialTheme.colorScheme.secondary
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(12.dp))
+
+                // Boton "Cancel"
+                Button(
+                    onClick = onCancel,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(48.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.surfaceVariant
+                    ),
+                    shape = RoundedCornerShape(25.dp)
+                ) {
+                    Text(
+                        text = "Cancel",
+                        fontSize = 15.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            }
+        }
+    }
+}
+
+
 @Preview(showBackground = true, widthDp = 430, heightDp = 932)
 @Composable
 fun ProfileScreenPreview() {
     FinanceAppTheme(darkTheme = false) { // <-- Cambia a 'true' para probar modo oscuro
         ProfileScreen(
             darkTheme = false
-            // Los otros parámetros tienen valores por defecto
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun LogoutConfirmationDialogPreview() {
+    FinanceAppTheme(darkTheme = false) {
+        LogoutConfirmationDialog(
+            onConfirm = {},
+            onCancel = {}
         )
     }
 }
