@@ -17,10 +17,6 @@ import com.example.financeapp.ui.screens.launch.WelcomeScreen
 import com.example.financeapp.ui.screens.launch.SplashScreen
 import com.example.financeapp.ui.screens.profile.ProfileScreen
 import com.example.financeapp.ui.screens.profile.edit_profile.EditProfileScreen
-import com.example.financeapp.ui.screens.security.SecurityScreen
-import com.example.financeapp.ui.screens.security.ChangePinScreen
-import com.example.financeapp.ui.screens.security.FingerprintScreen
-import com.example.financeapp.ui.screens.security.TermsAndConditionsScreen
 import com.example.financeapp.ui.screens.settings.SettingsScreen
 import com.example.financeapp.ui.screens.settings.NotificationSettingsScreen
 import com.example.financeapp.ui.screens.settings.PasswordSettingsScreen
@@ -193,108 +189,6 @@ fun FinWiseNavigation(
             )
         }
 
-        composable(Screen.Security.route) {
-            SecurityScreen(
-                darkTheme = isDarkTheme,
-                currentRoute = Screen.Profile.route, // Mantiene Profile seleccionado en navbar
-                onNavigateBack = { navController.popBackStack() },
-                onNavigateToChangePin = {
-                    navController.navigate(Screen.ChangePin.route)
-                },
-                onNavigateToFingerprint = {
-                    navController.navigate(Screen.Fingerprint.route)
-                },
-                onNavigateToTermsAndConditions = {
-                    navController.navigate(Screen.TermsAndConditions.route)
-                },
-
-                // Callbacks del BottomNavBar
-                onNavigateToHome = {
-                    navController.navigate(Screen.Home.route) {
-                        popUpTo(navController.graph.startDestinationRoute!!) { saveState = true }
-                    }
-                },
-                onNavigateToAnalysis = { /* Falta implementar */ },
-                onNavigateToTransactions = { /* Falta implementar */ },
-                onNavigateToCategory = { /* Falta implementar */ },
-                onNavigateToProfile = { navController.navigate(Screen.Profile.route) }
-            )
-        }
-
-        // Pantalla Change Pin
-        composable(Screen.ChangePin.route) {
-            ChangePinScreen(
-                darkTheme = isDarkTheme,
-                currentRoute = Screen.Profile.route, // Mantiene Profile seleccionado en navbar
-                onNavigateBack = { navController.popBackStack() },
-                onChangePin = {
-                    // Falta implementar poder guardar nuevo PIN con Room
-                    navController.popBackStack()
-                },
-
-                // Callbacks del BottomNavBar
-                onNavigateToHome = {
-                    navController.navigate(Screen.Home.route) {
-                        popUpTo(navController.graph.startDestinationRoute!!) { saveState = true }
-                    }
-                },
-                onNavigateToAnalysis = { /* Falta implementar */ },
-                onNavigateToTransactions = { /* Falta implementar */ },
-                onNavigateToCategory = { /* Falta implementar */ },
-                onNavigateToProfile = { navController.navigate(Screen.Profile.route) }
-            )
-        }
-
-        // Pantalla Fingerprint
-        composable(Screen.Fingerprint.route) {
-            FingerprintScreen(
-                darkTheme = isDarkTheme,
-                currentRoute = Screen.Profile.route, // Mantiene Profile seleccionado en navbar
-                onNavigateBack = { navController.popBackStack() },
-                onViewFingerprint = {
-                    // Falta implementar
-                },
-                onAddFingerprint = {
-                    // Falta implementar
-                },
-
-                // Callbacks del BottomNavBar
-                onNavigateToHome = {
-                    navController.navigate(Screen.Home.route) {
-                        popUpTo(navController.graph.startDestinationRoute!!) { saveState = true }
-                    }
-                },
-                onNavigateToAnalysis = { /* Falta implementar */ },
-                onNavigateToTransactions = { /* Falta implementar */ },
-                onNavigateToCategory = { /* Falta implementar */ },
-                onNavigateToProfile = { navController.navigate(Screen.Profile.route) }
-            )
-        }
-
-        // Pantalla Terms And Conditions
-        composable(Screen.TermsAndConditions.route) {
-            TermsAndConditionsScreen(
-                darkTheme = isDarkTheme,
-                currentRoute = Screen.Profile.route, // Mantiene Profile seleccionado en navbar
-                onNavigateBack = { navController.popBackStack() },
-                onAccept = {
-                    // Falta implementar
-                    navController.popBackStack()
-                },
-
-                // Callbacks del BottomNavBar
-                onNavigateToHome = {
-                    navController.navigate(Screen.Home.route) {
-                        popUpTo(navController.graph.startDestinationRoute!!) { saveState = true }
-                    }
-                },
-                onNavigateToAnalysis = { /* Falta implementar */ },
-                onNavigateToTransactions = { /* Falta implementar */ },
-                onNavigateToCategory = { /* Falta implementar */ },
-                onNavigateToProfile = { navController.navigate(Screen.Profile.route) }
-            )
-        }
-
         // Pantalla Settings (Configuracion general)
         composable(Screen.Settings.route) {
             SettingsScreen(
@@ -350,10 +244,6 @@ fun FinWiseNavigation(
                 darkTheme = isDarkTheme,
                 currentRoute = Screen.Profile.route, // Mantiene Profile seleccionado en navbar
                 onNavigateBack = { navController.popBackStack() },
-                onChangePassword = { currentPassword, newPassword, confirmPassword ->
-                    // Falta validar y cambiar contraseña con Room
-                    navController.popBackStack()
-                },
 
                 // Callbacks del BottomNavBar
                 onNavigateToHome = {
