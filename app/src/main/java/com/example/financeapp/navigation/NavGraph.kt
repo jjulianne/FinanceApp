@@ -21,6 +21,8 @@ import com.example.financeapp.ui.screens.settings.SettingsScreen
 import com.example.financeapp.ui.screens.settings.NotificationSettingsScreen
 import com.example.financeapp.ui.screens.settings.PasswordSettingsScreen
 import com.example.financeapp.ui.screens.settings.DeleteAccountScreen
+import com.example.financeapp.ui.screens.help.HelpScreen
+import com.example.financeapp.ui.screens.help.OnlineSupportScreen
 
 
 // Definicion de rutas de navegacion de la aplicacion
@@ -53,6 +55,9 @@ sealed class Screen(val route: String) {
     object Transactions : Screen("transactions_route")
     object Categories : Screen("categories_route")
     object SavingGoals : Screen("saving_goals_route")
+
+    object Help : Screen("help_route")
+    object OnlineSupport : Screen("online_support_route")
 }
 
 @Composable
@@ -160,7 +165,7 @@ fun FinWiseNavigation(
                 onNavigateToEditProfile = { navController.navigate(route = Screen.EditProfile.route) },
                 onNavigateToSecurity = { navController.navigate(Screen.Security.route) },
                 onNavigateToSettings = { navController.navigate(Screen.Settings.route) },
-                onNavigateToHelp = { /* Falta implementar */ },
+                onNavigateToHelp = { navController.navigate(Screen.Help.route) },
                 onLogout = { /* Falta implementar */ },
 
                 // Callbacks del BottomNavBar
@@ -263,6 +268,48 @@ fun FinWiseNavigation(
             DeleteAccountScreen(
                 darkTheme = isDarkTheme,
                 currentRoute = Screen.Profile.route, // Mantiene Profile seleccionado en navbar
+                onNavigateBack = { navController.popBackStack() },
+
+                // Callbacks del BottomNavBar
+                onNavigateToHome = {
+                    navController.navigate(Screen.Home.route) {
+                        popUpTo(navController.graph.startDestinationRoute!!) { saveState = true }
+                    }
+                },
+                onNavigateToAnalysis = { /* Falta implementar */ },
+                onNavigateToTransactions = { /* Falta implementar */ },
+                onNavigateToCategory = { /* Falta implementar */ },
+                onNavigateToProfile = { navController.navigate(Screen.Profile.route) }
+            )
+        }
+
+        composable(Screen.Help.route) {
+            HelpScreen(
+                darkTheme = isDarkTheme,
+                currentRoute = Screen.Profile.route,
+                onNavigateBack = { navController.popBackStack() },
+
+                onNavigateToCustomerService = {
+                    navController.navigate(Screen.OnlineSupport.route)
+                },
+
+                // Callbacks del BottomNavBar
+                onNavigateToHome = {
+                    navController.navigate(Screen.Home.route) {
+                        popUpTo(navController.graph.startDestinationRoute!!) { saveState = true }
+                    }
+                },
+                onNavigateToAnalysis = { /* Falta implementar */ },
+                onNavigateToTransactions = { /* Falta implementar */ },
+                onNavigateToCategory = { /* Falta implementar */ },
+                onNavigateToProfile = { navController.navigate(Screen.Profile.route) }
+            )
+        }
+
+        composable(Screen.OnlineSupport.route) {
+            OnlineSupportScreen(
+                darkTheme = isDarkTheme,
+                currentRoute = Screen.Profile.route, // Mantiene Profile seleccionado
                 onNavigateBack = { navController.popBackStack() },
 
                 // Callbacks del BottomNavBar
