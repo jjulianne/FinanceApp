@@ -50,8 +50,7 @@ fun FinWiseNavigation(
     isDarkTheme: Boolean,
     onThemeChange: (Boolean) -> Unit,
     navController: NavHostController = rememberNavController(),
-    //startDestination: String = Screen.Splash.route
-    startDestination: String = Screen.Profile.route // momentaneo  para pruebas
+    startDestination: String = Screen.Splash.route
 ) {
     NavHost(
         navController = navController,
