@@ -21,36 +21,44 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.financeApp.R
 import com.example.financeapp.components.AppHeader
 import com.example.financeapp.components.BottomNavBar
 import com.example.financeapp.ui.theme.FinanceAppTheme
+import kotlinx.coroutines.flow.collectLatest
 
 @Composable
 fun EditProfileScreen(
+    viewModel: EditProfileViewModel = hiltViewModel(),
     darkTheme: Boolean,
     onThemeChange: (Boolean) -> Unit,
     currentRoute: String = "profile_route",
     onNavigateBack: () -> Unit = {},
-    onUpdateProfile: () -> Unit = {},
     onNavigateToHome: () -> Unit = {},
     onNavigateToAnalysis: () -> Unit = {},
     onNavigateToTransactions: () -> Unit = {},
     onNavigateToCategory: () -> Unit = {},
     onNavigateToProfile: () -> Unit = {}
 ) {
-    // Estados para los campos de texto
-    var username by remember { mutableStateOf("John Smith") }
-    var phone by remember { mutableStateOf("+44 555 5555 55") }
-    var email by remember { mutableStateOf("example@example.com") }
-    var pushNotifications by remember { mutableStateOf(true) }
+    val uiState by viewModel.uiState.collectAsState()
+
+    LaunchedEffect(key1 = true) {
+        viewModel.eventFlow.collectLatest { event ->
+            when (event) {
+                is EditProfileEvent.ProfileSaved -> {
+                    onNavigateBack()
+                }
+            }
+        }
+    }
 
 
     Scaffold(
         bottomBar = {
             BottomNavBar(
                 currentRoute = currentRoute,
-                darkTheme = darkTheme, // <-- 4. Usamos el parámetro global
+                darkTheme = darkTheme,
                 onNavigateToHome = onNavigateToHome,
                 onNavigateToAnalysis = onNavigateToAnalysis,
                 onNavigateToTransactions = onNavigateToTransactions,
@@ -58,10 +66,11 @@ fun EditProfileScreen(
                 onNavigateToProfile = onNavigateToProfile
             )
         }
-    ) { _ ->
+    ) { paddingValues ->
         Box(
             modifier = Modifier
                 .fillMaxSize()
+                .padding(paddingValues)
                 // Usamos el color de fondo principal
                 .background(MaterialTheme.colorScheme.background)
         ) {
@@ -72,180 +81,222 @@ fun EditProfileScreen(
                 onNotifications = { /* Falta implementar notificaciones */ }
             )
 
-            // Tarjeta blanca de fondo
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .offset(y = 175.dp)
-                    .fillMaxHeight()
-                    .clip(RoundedCornerShape(topStart = 40.dp, topEnd = 40.dp))
-                    // Usamos el color de superficie (fondo de tarjetas)
-                    .background(MaterialTheme.colorScheme.surface)
-            )
-
-            // Foto de perfil con icono de editar
-            Box(
-                modifier = Modifier
-                    .offset(x = 157.dp, y = 117.dp)
-                    .size(117.dp)
-            ) {
-                // Foto de perfil
-                Box(
-                    modifier = Modifier
-                        .size(117.dp)
-                        .clip(CircleShape)
-                        .background(Color.Gray.copy(alpha = 0.2f))
-                ) {
-                    Image(
-                        painter = painterResource(id = R.drawable.jsmith_profile),
-                        contentDescription = "Profile Picture",
-                        contentScale = ContentScale.Crop,
-                        modifier = Modifier
-                            .size(180.dp)
-                            .align(Alignment.TopCenter)
-                    )
-                }
-
-                // Icono de camara para editar foto
-                Box(
-                    modifier = Modifier
-                        .size(32.dp)
-                        .align(Alignment.BottomEnd)
-                        .offset(x = (-5).dp, y = (-5).dp)
-                        .clip(CircleShape)
-                        .background(MaterialTheme.colorScheme.primary)
-                        .clickable(
-                            indication = null,
-                            interactionSource = remember { MutableInteractionSource() }
-                        ) {
-                            // Falta implementar galeria para cambio de foto
-                        },
-                    contentAlignment = Alignment.Center
-                ) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.camera_green),
-                        contentDescription = "Edit photo",
-                        modifier = Modifier.size(16.dp)
-                    )
-                }
+            if (uiState.isLoading) {
+                CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+            } else {
+                // Mostramos el contenido solo cuando la carga termino
+                EditProfileContent(
+                    uiState = uiState,
+                    onUsernameChanged = viewModel::onUsernameChanged,
+                    onPhoneChanged = viewModel::onPhoneChanged,
+                    onEmailChanged = viewModel::onEmailChanged,
+                    onPushNotificationsChanged = viewModel::onPushNotificationsChanged,
+                    onUpdateProfileClick = viewModel::updateProfile,
+                    darkTheme = darkTheme,
+                    onThemeChange = onThemeChange
+                )
             }
+        }
+    }
+}
 
-            // Nombre de Usuario
-            Text(
-                text = "John Smith",
-                fontSize = 20.sp,
-                fontWeight = FontWeight.Bold,
-                // Texto sobre la superficie (tarjeta)
-                color = MaterialTheme.colorScheme.onSurface,
+/**
+ * Composable privado para el contenido principal (formulario)
+ */
+@Composable
+private fun EditProfileContent(
+    uiState: EditProfileUiState,
+    onUsernameChanged: (String) -> Unit,
+    onPhoneChanged: (String) -> Unit,
+    onEmailChanged: (String) -> Unit,
+    onPushNotificationsChanged: (Boolean) -> Unit,
+    onUpdateProfileClick: () -> Unit,
+    darkTheme: Boolean,
+    onThemeChange: (Boolean) -> Unit
+) {
+    // Tarjeta blanca de fondo
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .offset(y = 175.dp)
+            .fillMaxHeight()
+            .clip(RoundedCornerShape(topStart = 40.dp, topEnd = 40.dp))
+            // Usamos el color de superficie (fondo de tarjetas)
+            .background(MaterialTheme.colorScheme.surface)
+    )
+
+    // Foto de perfil con icono de editar
+    Box(
+        modifier = Modifier
+            .offset(x = 157.dp, y = 117.dp)
+            .size(117.dp)
+    ) {
+        // Foto de perfil
+        Box(
+            modifier = Modifier
+                .size(117.dp)
+                .clip(CircleShape)
+                .background(Color.Gray.copy(alpha = 0.2f))
+        ) {
+            Image(
+                painter = painterResource(id = R.drawable.jsmith_profile),
+                contentDescription = "Profile Picture",
+                contentScale = ContentScale.Crop,
                 modifier = Modifier
-                    .offset(x = 157.dp, y = 252.dp)
-                    .height(30.dp),
-                textAlign = TextAlign.Center
+                    .size(180.dp)
+                    .align(Alignment.TopCenter)
             )
+        }
 
-            // ID de Usuario
-            Text(
-                text = "ID: 25030024",
-                fontSize = 12.sp,
-                fontWeight = FontWeight.Normal,
-                // Texto sobre la superficie (tarjeta), con alfa
-                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
-                modifier = Modifier
-                    .offset(x = 175.dp, y = 278.dp)
-                    .width(82.dp)
-                    .height(20.dp),
-                textAlign = TextAlign.Center
-            )
-
-            // Formulario de configuracion
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .offset(y = 315.dp)
-                    .padding(horizontal = 38.dp)
-            ) {
-                // Titulo
-                Text(
-                    text = "Account Settings",
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold,
-                    // Texto sobre la superficie (tarjeta)
-                    color = MaterialTheme.colorScheme.onSurface,
-                    modifier = Modifier.padding(bottom = 12.dp)
-                )
-
-                // Username
-                SettingsTextField(
-                    label = "Username",
-                    value = username,
-                    onValueChange = { username = it }
-                )
-
-                Spacer(modifier = Modifier.height(12.dp))
-
-                // Phone
-                SettingsTextField(
-                    label = "Phone",
-                    value = phone,
-                    onValueChange = { phone = it }
-                )
-
-                Spacer(modifier = Modifier.height(12.dp))
-
-                // Email Address
-                SettingsTextField(
-                    label = "Email Address",
-                    value = email,
-                    onValueChange = { email = it }
-                )
-
-                Spacer(modifier = Modifier.height(20.dp))
-
-                // Notifications Toggle
-                SettingsToggleRow(
-                    label = "Push Notifications",
-                    checked = pushNotifications,
-                    onCheckedChange = { pushNotifications = it }
-                )
-
-                Spacer(modifier = Modifier.height(12.dp))
-
-
-                SettingsToggleRow(
-                    label = "Turn Dark Theme",
-                    checked = darkTheme,
-                    onCheckedChange = onThemeChange // <-- Llama a la funciOn del ViewModel
-                )
-
-                Spacer(modifier = Modifier.height(28.dp))
-
-                // Update Profile
-                Box(
-                    modifier = Modifier.fillMaxWidth(),
-                    contentAlignment = Alignment.Center
+        // Icono de camara para editar foto
+        Box(
+            modifier = Modifier
+                .size(32.dp)
+                .align(Alignment.BottomEnd)
+                .offset(x = (-5).dp, y = (-5).dp)
+                .clip(CircleShape)
+                .background(MaterialTheme.colorScheme.primary)
+                .clickable(
+                    indication = null,
+                    interactionSource = remember { MutableInteractionSource() }
                 ) {
-                    Button(
-                        onClick = onUpdateProfile,
-                        modifier = Modifier
-                            .width(169.dp)
-                            .height(36.dp),
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = MaterialTheme.colorScheme.primary
-                        ),
-                        shape = RoundedCornerShape(25.dp)
-                    ) {
-                        Text(
-                            text = "Update Profile",
-                            fontSize = 14.sp,
-                            fontWeight = FontWeight.SemiBold,
-                            color = MaterialTheme.colorScheme.secondary
-                        )
-                    }
+                    // Falta implementar galeria para cambio de foto
+                },
+            contentAlignment = Alignment.Center
+        ) {
+            Icon(
+                painter = painterResource(id = R.drawable.camera_green),
+                contentDescription = "Edit photo",
+                modifier = Modifier.size(16.dp)
+            )
+        }
+    }
+
+    // Nombre de Usuario
+    Text(
+        text = uiState.originalUsername,
+        fontSize = 20.sp,
+        fontWeight = FontWeight.Bold,
+        // Texto sobre la superficie (tarjeta)
+        color = MaterialTheme.colorScheme.onSurface,
+        modifier = Modifier
+            .offset(x = 157.dp, y = 252.dp)
+            .height(30.dp),
+        textAlign = TextAlign.Center
+    )
+
+    // ID de Usuario
+    Text(
+        text = "ID: ${uiState.userId}",
+        fontSize = 12.sp,
+        fontWeight = FontWeight.Normal,
+        // Texto sobre la superficie (tarjeta), con alfa
+        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
+        modifier = Modifier
+            .offset(x = 175.dp, y = 278.dp)
+            .width(82.dp)
+            .height(20.dp),
+        textAlign = TextAlign.Center
+    )
+
+    // Formulario de configuracion
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .offset(y = 315.dp)
+            .padding(horizontal = 38.dp)
+    ) {
+        // Titulo
+        Text(
+            text = "Account Settings",
+            fontSize = 18.sp,
+            fontWeight = FontWeight.Bold,
+            // Texto sobre la superficie (tarjeta)
+            color = MaterialTheme.colorScheme.onSurface,
+            modifier = Modifier.padding(bottom = 12.dp)
+        )
+
+        // Username
+        SettingsTextField(
+            label = "Username",
+            value = uiState.formUsername,
+            onValueChange = onUsernameChanged
+        )
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        // Phone
+        SettingsTextField(
+            label = "Phone",
+            value = uiState.formPhone,
+            onValueChange = onPhoneChanged
+        )
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        // Email Address
+        SettingsTextField(
+            label = "Email Address",
+            value = uiState.formEmail,
+            onValueChange = onEmailChanged
+        )
+
+        Spacer(modifier = Modifier.height(20.dp))
+
+        // Notifications Toggle
+        SettingsToggleRow(
+            label = "Push Notifications",
+            checked = uiState.formPushNotifications,
+            onCheckedChange = onPushNotificationsChanged
+        )
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+
+        SettingsToggleRow(
+            label = "Turn Dark Theme",
+            checked = darkTheme,
+            onCheckedChange = onThemeChange // Llama a la funciOn del ViewModel
+        )
+
+        Spacer(modifier = Modifier.height(28.dp))
+
+        // Update Profile
+        Box(
+            modifier = Modifier.fillMaxWidth(),
+            contentAlignment = Alignment.Center
+        ) {
+            Button(
+                onClick = onUpdateProfileClick,
+                enabled = !uiState.isSaving,
+                modifier = Modifier
+                    .width(169.dp)
+                    .height(36.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.primary
+                ),
+                shape = RoundedCornerShape(25.dp)
+            ) {
+                // Muestra spinner si está guardando
+                if (uiState.isSaving) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(20.dp),
+                        color = MaterialTheme.colorScheme.secondary,
+                        strokeWidth = 2.dp
+                    )
+                } else {
+                    Text(
+                        text = "Update Profile",
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        color = MaterialTheme.colorScheme.secondary
+                    )
                 }
             }
         }
     }
 }
+
 
 /**
  * Campo de texto personalizado para configuraciones
@@ -344,5 +395,50 @@ fun EditProfileScreenPreview() {
             darkTheme = false,
             onThemeChange = { /* No hace nada en el preview */ }
         )
+    }
+}
+
+@Preview(showBackground = true, name = "Default State", widthDp = 430, heightDp = 932)
+@Composable
+fun EditProfileScreenPreviewSinViewModel() {
+    FinanceAppTheme(darkTheme = false) { // Si queres ver el modo oscuro ponele 'true'
+
+        // Creamos un estado de prueba para el preview sin viewmodel
+        val fakeSuccessState = EditProfileUiState(
+            isLoading = false,
+            isSaving = false,
+            userId = 25030024,
+            originalUsername = "John Smith",
+            formUsername = "John Smith",
+            formPhone = "+44 555 5555 55",
+            formEmail = "example@example.com",
+            formPushNotifications = true
+        )
+
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(MaterialTheme.colorScheme.background)
+        ) {
+            // Header
+            AppHeader(
+                title = "Edit My Profile",
+                onNavigateBack = {},
+                onNotifications = {}
+            )
+
+            // Se llama a EditProfileContent directamente pero con los datos falsos
+            // (Usamos las lambdas vacías {} porque no hacen nada en el preview)
+            EditProfileContent(
+                uiState = fakeSuccessState,
+                onUsernameChanged = {},
+                onPhoneChanged = {},
+                onEmailChanged = {},
+                onPushNotificationsChanged = {},
+                onUpdateProfileClick = {},
+                darkTheme = false,
+                onThemeChange = {}
+            )
+        }
     }
 }
