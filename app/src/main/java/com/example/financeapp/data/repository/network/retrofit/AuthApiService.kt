@@ -6,18 +6,26 @@ import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.POST
 
+
 interface AuthApiService {
 
-    // Endpoint simulado de login
     @POST("auth/login")
     suspend fun loginUser(
         @Header("x-api-key") apiKey: String = "123456789",
         @Body credentials: LoginRequest
-    ): User
+    ): retrofit2.Response<LoginResponse>
 
-    // Endpoint simulado para obtener el perfil del usuario
+    @POST("auth/create")
+    suspend fun createUser(
+        @Header("x-api-key") apiKey: String = "123456789",
+        @Body user: CreateUserRequest
+    ): retrofit2.Response<CreateUserResponse>
+
+
+
     @GET("users/12345")
     suspend fun getUserProfile(
         @Header("x-api-key") apiKey: String = "123456789"
-    ): User
+    ): retrofit2.Response<User>
 }
+

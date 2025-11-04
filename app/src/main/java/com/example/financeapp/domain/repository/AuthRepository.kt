@@ -9,4 +9,9 @@ interface AuthRepository {
 
     // Nuevo método: login con credenciales
     suspend fun login(email: String, password: String): User
+
+    suspend fun logout()
+
+    suspend fun createUser(username: String, email: String, password: String): User
+
 }
