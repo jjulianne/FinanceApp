@@ -11,11 +11,13 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -32,6 +34,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.financeApp.R
 import com.example.financeapp.components.BottomNavBar
 import com.example.financeapp.components.AppHeader
@@ -39,6 +42,7 @@ import com.example.financeapp.ui.theme.FinanceAppTheme
 
 @Composable
 fun ProfileScreen(
+    viewModel: ProfileViewModel = hiltViewModel(),
     darkTheme: Boolean,
     currentRoute: String = "profile_route",
     onNavigateBack: () -> Unit = {},
@@ -53,6 +57,7 @@ fun ProfileScreen(
     onNavigateToCategory: () -> Unit = {},
     onNavigateToProfile: () -> Unit = {},
 ) {
+    val uiState by viewModel.uiState.collectAsState()
     var showLogoutDialog by remember { mutableStateOf(false) }
 
     Scaffold(
@@ -67,15 +72,15 @@ fun ProfileScreen(
                 onNavigateToProfile = onNavigateToProfile
             )
         }
-    ) { _ ->
+    ) { paddingValues ->
 
         // Box principal con fondo verde
         Box(
             modifier = Modifier
                 .fillMaxSize()
+                .padding(paddingValues)
                 .background(MaterialTheme.colorScheme.background)
         ) {
-
 
             // Header (TopBar)
             AppHeader(
@@ -84,126 +89,166 @@ fun ProfileScreen(
                 onNotifications = { /* Falta implementar notificaciones */ }
             )
 
-
-            // Tarjeta blanca de fondo (Base Shape)
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .offset(y = 175.dp)
-                    .height(757.dp) // Se extiende hasta el fondo, por debajo del NavBottom
-                    .clip(RoundedCornerShape(topStart = 40.dp, topEnd = 40.dp))
-                    .background(MaterialTheme.colorScheme.surface)
-            )
-
-            // Foto de Perfil
-            // Box contenedor para la foto
-            Box(
-                modifier = Modifier
-                    .offset(x = 157.dp, y = 117.dp)
-                    .size(117.dp)
-                    .clip(CircleShape)
-                    .background(Color.Gray.copy(alpha = 0.2f)) // Fondo por si la imagen no carga
-            ) {
-                // Imagen (Lo que se ve dentro del Box)
-                Image(
-                    painter = painterResource(id = R.drawable.jsmith_profile),
-                    contentDescription = "Profile Picture",
-                    contentScale = ContentScale.Crop, // Crop para rellenar el size de la imagen
-                    modifier = Modifier
-                        .size(180.dp)
-                        .align(Alignment.TopCenter) // Centra la imagen grande
-                )
+            when (val state = uiState) {
+                is ProfileUiState.Loading -> {
+                    // Estado de Carga
+                    CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+                }
+                is ProfileUiState.Success -> {
+                    // Estado Success
+                    ProfileContent(
+                        user = state.user, // Pasamos el usuario al contenido
+                        onNavigateToEditProfile = onNavigateToEditProfile,
+                        onNavigateToSecurity = onNavigateToSecurity,
+                        onNavigateToSettings = onNavigateToSettings,
+                        onNavigateToHelp = onNavigateToHelp,
+                        onShowLogoutDialog = { showLogoutDialog = true } // Lambda para mostrar el popup
+                    )
+                }
+                is ProfileUiState.Error -> {
+                    // Estado de Error
+                    Text(
+                        text = state.message,
+                        color = MaterialTheme.colorScheme.error,
+                        modifier = Modifier.align(Alignment.Center)
+                    )
+                }
             }
 
-            // Nombre de Usuario
-            Text(
-                text = "John Smith",
-                fontSize = 20.sp,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onSurface,
-                modifier = Modifier
-                    .offset(x = 157.dp, y = 252.dp)
-                    .height(30.dp),
-                textAlign = TextAlign.Center
-            )
-
-            // ID de Usuario
-            Text(
-                text = "ID: 25030024",
-                fontSize = 12.sp,
-                fontWeight = FontWeight.Normal,
-                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
-                modifier = Modifier
-                    .offset(x = 175.dp, y = 278.dp)
-                    .width(82.dp)
-                    .height(20.dp),
-                textAlign = TextAlign.Center
-            )
-
-            // List
-            Column(
-                modifier = Modifier
-                    .offset(x = 38.dp, y = 350.dp)
-                    .width(200.dp),
-            ) {
-                ProfileMenuItem(
-                    icon = R.drawable.profile,
-                    text = "Edit Profile",
-                    backgroundColor = Color(0xFF6DB6FE),
-                    onClick = onNavigateToEditProfile
-                )
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                ProfileMenuItem(
-                    icon = R.drawable.security,
-                    text = "Security",
-                    backgroundColor = Color(0xFF3299FF),
-                    onClick = onNavigateToSecurity
-                )
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                ProfileMenuItem(
-                    icon = R.drawable.settings,
-                    text = "Setting",
-                    backgroundColor = Color(0xFF0068FF),
-                    onClick = onNavigateToSettings
-                )
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                ProfileMenuItem(
-                    icon = R.drawable.help_white,
-                    text = "Help",
-                    backgroundColor = Color(0xFF6DB6FE),
-                    onClick = onNavigateToHelp
-                )
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                ProfileMenuItem(
-                    icon = R.drawable.logout,
-                    text = "Logout",
-                    backgroundColor = Color(0xFF3299FF),
-                    onClick = { showLogoutDialog = true } // <-- Ahora muestra el popup
-                )
-            }
 
             if (showLogoutDialog) {
                 LogoutConfirmationDialog(
                     onConfirm = {
                         showLogoutDialog = false
-                        onLogout() // Llama a la acción original de logout
+                        onLogout()
                     },
                     onCancel = {
-                        showLogoutDialog = false // Simplemente cierra el popup
+                        showLogoutDialog = false
                     }
                 )
             }
         }
     }
 }
+
+/**
+ * Contenido principal de la pantalla de perfil (cuando los datos se cargaron).
+ */
+@Composable
+private fun ProfileContent(
+    user: User, // Recibe el objeto User con los datos
+    onNavigateToEditProfile: () -> Unit,
+    onNavigateToSecurity: () -> Unit,
+    onNavigateToSettings: () -> Unit,
+    onNavigateToHelp: () -> Unit,
+    onShowLogoutDialog: () -> Unit
+) {
+    // Tarjeta blanca de fondo (Base Shape)
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .offset(y = 175.dp)
+            .height(757.dp) // Se extiende hasta el fondo, por debajo del NavBottom
+            .clip(RoundedCornerShape(topStart = 40.dp, topEnd = 40.dp))
+            .background(MaterialTheme.colorScheme.surface)
+    )
+
+    // Foto de Perfil
+    // Box contenedor para la foto
+    Box(
+        modifier = Modifier
+            .offset(x = 157.dp, y = 117.dp)
+            .size(117.dp)
+            .clip(CircleShape)
+            .background(Color.Gray.copy(alpha = 0.2f)) // Fondo por si la imagen no carga
+    ) {
+        // Imagen
+        Image(
+            painter = painterResource(id = R.drawable.jsmith_profile),
+            contentDescription = "Profile Picture",
+            contentScale = ContentScale.Crop, // Crop para rellenar el size de la imagen
+            modifier = Modifier
+                .size(180.dp)
+                .align(Alignment.TopCenter) // Centra la imagen grande
+        )
+    }
+
+    // Nombre de Usuario
+    Text(
+        text = user.fullName,
+        fontSize = 20.sp,
+        fontWeight = FontWeight.Bold,
+        color = MaterialTheme.colorScheme.onSurface,
+        modifier = Modifier
+            .offset(x = 157.dp, y = 252.dp)
+            .height(30.dp),
+        textAlign = TextAlign.Center
+    )
+
+    // ID de Usuario
+    Text(
+        text = "ID: ${user.id}",
+        fontSize = 12.sp,
+        fontWeight = FontWeight.Normal,
+        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
+        modifier = Modifier
+            .offset(x = 175.dp, y = 278.dp)
+            .width(82.dp)
+            .height(20.dp),
+        textAlign = TextAlign.Center
+    )
+
+    // List
+    Column(
+        modifier = Modifier
+            .offset(x = 38.dp, y = 350.dp)
+            .width(200.dp),
+    ) {
+        ProfileMenuItem(
+            icon = R.drawable.profile,
+            text = "Edit Profile",
+            backgroundColor = Color(0xFF6DB6FE),
+            onClick = onNavigateToEditProfile
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        ProfileMenuItem(
+            icon = R.drawable.security,
+            text = "Security",
+            backgroundColor = Color(0xFF3299FF),
+            onClick = onNavigateToSecurity
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        ProfileMenuItem(
+            icon = R.drawable.settings,
+            text = "Setting",
+            backgroundColor = Color(0xFF0068FF),
+            onClick = onNavigateToSettings
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        ProfileMenuItem(
+            icon = R.drawable.help_white,
+            text = "Help",
+            backgroundColor = Color(0xFF6DB6FE),
+            onClick = onNavigateToHelp
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        ProfileMenuItem(
+            icon = R.drawable.logout,
+            text = "Logout",
+            backgroundColor = Color(0xFF3299FF),
+            onClick = onShowLogoutDialog
+        )
+    }
+}
+
 
 /**
  * Componente para cada item de la lista de opciones
@@ -264,7 +309,7 @@ private fun LogoutConfirmationDialog(
     onConfirm: () -> Unit,
     onCancel: () -> Unit
 ) {
-    // Dialog proporciona el fondo oscurecido (scrim) automaticamente
+    // Dialog proporciona el fondo oscurecido automaticamente
     Dialog(onDismissRequest = onCancel) {
         Card(
             shape = RoundedCornerShape(24.dp), // Esquinas redondeadas como en la imagen
@@ -308,7 +353,6 @@ private fun LogoutConfirmationDialog(
                         .fillMaxWidth()
                         .height(48.dp),
                     colors = ButtonDefaults.buttonColors(
-                        // Usamos el color primario del tema (verde)
                         containerColor = MaterialTheme.colorScheme.primary
                     ),
                     shape = RoundedCornerShape(25.dp)
@@ -317,7 +361,6 @@ private fun LogoutConfirmationDialog(
                         text = "Yes, End Session",
                         fontSize = 15.sp,
                         fontWeight = FontWeight.SemiBold,
-                        // Usamos el color secundario (blanco/claro)
                         color = MaterialTheme.colorScheme.secondary
                     )
                 }
@@ -351,7 +394,7 @@ private fun LogoutConfirmationDialog(
 @Preview(showBackground = true, widthDp = 430, heightDp = 932)
 @Composable
 fun ProfileScreenPreview() {
-    FinanceAppTheme(darkTheme = false) { // <-- Cambia a 'true' para probar modo oscuro
+    FinanceAppTheme(darkTheme = false) { // Cambia a 'true' para probar modo oscuro
         ProfileScreen(
             darkTheme = false
         )
