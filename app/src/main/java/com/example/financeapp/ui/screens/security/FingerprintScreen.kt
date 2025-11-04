@@ -54,11 +54,10 @@ fun FingerprintScreen(
                 onNavigateToProfile = onNavigateToProfile
             )
         }
-    ) { paddingValues ->
+    ) { _ -> // Antes tenia un padding el cual borre porque sino me tiraba la pantalla para abajo
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(paddingValues)
                 .background(MaterialTheme.colorScheme.background)
         ) {
             // Header
