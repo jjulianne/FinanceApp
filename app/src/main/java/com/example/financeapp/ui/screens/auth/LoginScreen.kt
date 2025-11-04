@@ -2,7 +2,7 @@ package com.example.financeapp.ui.screens.auth
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.material3.Text
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -11,18 +11,38 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import com.example.financeapp.ui.components.AuthComponents.*
 import com.example.financeapp.ui.theme.FinWiseDarkGreen
 import com.example.financeapp.ui.theme.FinWiseGreen
+import com.example.financeapp.viewmodel.AuthViewModel
+import kotlinx.coroutines.launch
 
 @Composable
 fun LoginScreen(
+
     onNavigateToForgotPassword: () -> Unit = {},
     onNavigateToSignUp: () -> Unit = {},
-    onLogin: () -> Unit = {}
+    onLogin: () -> Unit = {},
+    viewModel: AuthViewModel = hiltViewModel()
 ) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
+
+    val isLoading by viewModel.isLoading.collectAsState()
+    val errorMessage by viewModel.errorMessage.collectAsState()
+    val isLoggedIn by viewModel.isLoggedIn.collectAsState()
+
+    val coroutineScope = rememberCoroutineScope()
+
+    // 🔁 Si el usuario se loguea correctamente, navegamos
+    LaunchedEffect(isLoggedIn) {
+        if (isLoggedIn) {
+            onLogin()
+        }
+    }
 
     AuthScreenLayout(title = "Welcome") {
 
@@ -48,11 +68,27 @@ fun LoginScreen(
 
         // 🟢 Botón Log In
         AppButton(
-            text = "Log In",
-            onClick = onLogin
+            text = if (isLoading) "Logging In..." else "Log In",
+            enabled = !isLoading,
+            onClick = {
+                coroutineScope.launch {
+                    viewModel.login(email, password)
+                }
+            }
         )
 
-        Spacer(modifier = Modifier.height(8.dp))
+        // 🔴 Mensaje de error (si falla el login)
+        if (!errorMessage.isNullOrEmpty()) {
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(
+                text = errorMessage ?: "",
+                color = MaterialTheme.colorScheme.error,
+                fontSize = 14.sp,
+                textAlign = TextAlign.Center
+            )
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
 
         // 🔗 Forgot Password
         AppTextButton(
@@ -65,13 +101,10 @@ fun LoginScreen(
         // 🟩 Botón Sign Up (versión clara)
         AppButton(
             text = "Sign Up",
-            onClick = onNavigateToSignUp,
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(50.dp)
+            onClick = onNavigateToSignUp
         )
 
-        Spacer(modifier = Modifier.height(20.dp))
+        Spacer(modifier = Modifier.height(30.dp))
 
         // 🖐️ Fingerprint Text
         Text(
@@ -84,7 +117,7 @@ fun LoginScreen(
 
         Spacer(modifier = Modifier.height(30.dp))
 
-        // 🌐 Sección de redes sociales (nuevo componente)
+        // 🌐 Sección de redes sociales
         AuthSocialSection(
             text = "or sign up with",
             onFacebookClick = { /* TODO: login con Facebook */ },
@@ -94,7 +127,10 @@ fun LoginScreen(
         Spacer(modifier = Modifier.height(30.dp))
 
         // 🧾 Texto final
-        Row {
+        Row(
+            horizontalArrangement = Arrangement.Center,
+            modifier = Modifier.fillMaxWidth()
+        ) {
             Text(
                 text = "Don’t have an account? ",
                 color = FinWiseDarkGreen.copy(alpha = 0.6f),

@@ -56,7 +56,7 @@ sealed class Screen(val route: String) {
 @Composable
 fun FinWiseNavigation(
     navController: NavHostController = rememberNavController(),
-    startDestination: String = Screen.Welcome.route
+    startDestination: String = Screen.Splash.route
 ) {
     NavHost(
         navController = navController,

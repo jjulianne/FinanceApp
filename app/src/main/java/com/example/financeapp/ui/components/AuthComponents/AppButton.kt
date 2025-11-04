@@ -9,32 +9,35 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.financeapp.ui.theme.FinWiseDarkGreen
 import com.example.financeapp.ui.theme.FinWiseGreen
+import com.example.financeapp.ui.theme.FinWiseDarkGreen
 
 @Composable
 fun AppButton(
     text: String,
     onClick: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true
 ) {
     Button(
         onClick = onClick,
         modifier = modifier
             .fillMaxWidth()
-            .height(50.dp),
-        shape = RoundedCornerShape(25.dp),
+            .height(45.dp),
+        shape = RoundedCornerShape(50),
         colors = ButtonDefaults.buttonColors(
-            containerColor = FinWiseGreen,
-            contentColor = FinWiseDarkGreen
+            containerColor = FinWiseGreen,       // 💚 Verde principal
+            contentColor = FinWiseDarkGreen      // Texto verde oscuro
         )
     ) {
         Text(
             text = text,
-            fontSize = 18.sp,
-            fontWeight = FontWeight.Bold
+            fontSize = 16.sp,
+            fontWeight = FontWeight.SemiBold,
+            textAlign = TextAlign.Center
         )
     }
 }
