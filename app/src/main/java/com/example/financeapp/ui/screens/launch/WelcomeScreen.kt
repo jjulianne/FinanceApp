@@ -98,7 +98,7 @@ fun WelcomeScreen(
             onClick = onNavigateToSignUp,
             modifier = Modifier
                 .offset(x = 112.dp, y = 587.dp)
-                .size(width = 260.dp, height = 50.dp),
+                .size(width = 207.dp, height = 45.dp),
             colors = ButtonDefaults.buttonColors(
                 containerColor = MaterialTheme.colorScheme.surfaceVariant // Color(0xFFD4F1E8)
             ),
