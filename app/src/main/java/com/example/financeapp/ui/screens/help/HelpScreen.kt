@@ -22,6 +22,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.financeApp.R
 import com.example.financeapp.components.AppHeader
 import com.example.financeapp.components.BottomNavBar
@@ -29,6 +30,7 @@ import com.example.financeapp.ui.theme.FinanceAppTheme
 
 @Composable
 fun HelpScreen(
+    viewModel: HelpViewModel = hiltViewModel(),
     darkTheme: Boolean,
     currentRoute: String = "profile_route",
     onNavigateBack: () -> Unit = {},
@@ -39,14 +41,7 @@ fun HelpScreen(
     onNavigateToCategory: () -> Unit = {},
     onNavigateToProfile: () -> Unit = {}
 ) {
-    // Estado para controlar qué tab está activo (FAQ o Contact Us)
-    var selectedTab by remember { mutableStateOf("FAQ") }
-
-    // Estado para el filtro de categoría en FAQ
-    var selectedCategory by remember { mutableStateOf("General") }
-
-    // Estado para el campo de búsqueda
-    var searchQuery by remember { mutableStateOf("") }
+    val state by viewModel.uiState.collectAsState()
 
     Scaffold(
         bottomBar = {
@@ -60,10 +55,11 @@ fun HelpScreen(
                 onNavigateToProfile = onNavigateToProfile
             )
         }
-    ) { _ ->
+    ) { paddingValues ->
         Box(
             modifier = Modifier
                 .fillMaxSize()
+                .padding(paddingValues)
                 .background(MaterialTheme.colorScheme.background)
         ) {
             // Header
@@ -106,14 +102,14 @@ fun HelpScreen(
                 ) {
                     TabButton(
                         text = "FAQ",
-                        isSelected = selectedTab == "FAQ",
-                        onClick = { selectedTab = "FAQ" },
+                        isSelected = state.selectedTab == "FAQ",
+                        onClick = { viewModel.onTabSelected("FAQ") },
                         modifier = Modifier.weight(1f)
                     )
                     TabButton(
                         text = "Contact Us",
-                        isSelected = selectedTab == "Contact Us",
-                        onClick = { selectedTab = "Contact Us" },
+                        isSelected = state.selectedTab == "Contact Us",
+                        onClick = { viewModel.onTabSelected("Contact Us") },
                         modifier = Modifier.weight(1f)
                     )
                 }
@@ -121,12 +117,14 @@ fun HelpScreen(
                 Spacer(modifier = Modifier.height(16.dp))
 
                 // Contenido según el tab seleccionado
-                when (selectedTab) {
+                when (state.selectedTab) {
                     "FAQ" -> FAQContent(
-                        selectedCategory = selectedCategory,
-                        onCategoryChange = { selectedCategory = it },
-                        searchQuery = searchQuery,
-                        onSearchQueryChange = { searchQuery = it }
+                        selectedCategory = state.selectedCategory,
+                        onCategoryChange = viewModel::onCategoryChange,
+                        searchQuery = state.searchQuery,
+                        onSearchQueryChange = viewModel::onSearchQueryChange,
+                        faqs = state.filteredFaqs,
+                        isLoading = state.isLoading
                     )
                     "Contact Us" -> ContactUsContent(
                         onNavigateToCustomerService = onNavigateToCustomerService
@@ -179,7 +177,9 @@ private fun FAQContent(
     selectedCategory: String,
     onCategoryChange: (String) -> Unit,
     searchQuery: String,
-    onSearchQueryChange: (String) -> Unit
+    onSearchQueryChange: (String) -> Unit,
+    faqs: List<FaqItem>,
+    isLoading: Boolean
 ) {
     Column {
         // Filtros de categoría
@@ -230,23 +230,36 @@ private fun FAQContent(
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        // Lista de preguntas FAQ
-        Column(
+        Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(460.dp) // Altura fija para scroll
-                .verticalScroll(rememberScrollState()),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
+                .height(460.dp), // Altura fija para scroll
+            contentAlignment = Alignment.Center
         ) {
-            FAQItem("How to use FinWise?")
-            FAQItem("How much does it cost to use FinWise?")
-            FAQItem("How to contact support?")
-            FAQItem("How can I reset my password if I forget it?")
-            FAQItem("Are there any privacy or data security measures in place?")
-            FAQItem("Can I customize settings within the application?")
-            FAQItem("How can I delete my account?")
-            FAQItem("How do I access my expense history?")
-            FAQItem("Can I use the app offline?")
+            if (isLoading) {
+                CircularProgressIndicator()
+            } else if (faqs.isEmpty()) {
+                Text(
+                    text = "No results found",
+                    fontSize = 14.sp,
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+                )
+            } else {
+                // Lista de preguntas FAQ
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .verticalScroll(rememberScrollState()),
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    faqs.forEach { faq ->
+                        FAQItem(
+                            question = faq.question,
+                            answer = faq.answer // Pasa la respuesta
+                        )
+                    }
+                }
+            }
         }
     }
 }
@@ -289,7 +302,10 @@ private fun CategoryChip(
  * Item expandible de FAQ
  */
 @Composable
-private fun FAQItem(question: String) {
+private fun FAQItem(
+    question: String,
+    answer: String
+) {
     var isExpanded by remember { mutableStateOf(false) }
 
     Column(
@@ -331,7 +347,7 @@ private fun FAQItem(question: String) {
             exit = shrinkVertically()
         ) {
             Text(
-                text = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+                text = answer,
                 fontSize = 13.sp,
                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
                 modifier = Modifier.padding(top = 8.dp)
@@ -383,7 +399,7 @@ private fun ContactItem(
                 interactionSource = remember { MutableInteractionSource() }
             ) {
                 onClick() // Llama al callback
-                },
+            },
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
