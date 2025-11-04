@@ -1,7 +1,5 @@
 package com.example.financeapp.components
 
-
-
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -25,6 +23,9 @@ import androidx.navigation.NavController
 import com.example.financeapp.core.* // Import data/constants
 import com.example.financeApp.R
 import com.example.financeapp.ui.theme.* // Importamos los colores de FinWise
+import java.time.Month
+import java.time.format.TextStyle
+import java.util.Locale
 
 // =========================================================================
 // MAIN REUSABLE SCREEN COMPONENT
@@ -38,7 +39,6 @@ fun TransactionListScreen(
     onExpenseClick: () -> Unit // Navigation callback for Expense
 ) {
     Scaffold(
-        // Assuming BottomNavBar is here, uncomment when ready:
         bottomBar = { BottomNavBar(navController = navController) },
         containerColor = FinWiseGreen // Usamos FinWiseGreen
     ) { padding ->
@@ -61,25 +61,31 @@ fun TransactionListScreen(
                     .fillMaxSize()
                     .clip(RoundedCornerShape(topStart = 32.dp, topEnd = 32.dp))
                     .background(FinWiseWhite) // Usamos FinWiseWhite
-                    .padding(horizontal = 16.dp)
-                    .offset(y = (-20).dp) // Adjust based on image
+                    .padding(horizontal = 24.dp) // Aumentamos el padding lateral para el contenido
+                    .offset(y = (-30).dp) // Offset para solapar el header
             ) {
 
-                Spacer(Modifier.height(16.dp))
-
-                // Group transactions by month
-                val groupedTransactions = content.transactions.groupBy {
-                    // Simple month extraction (e.g., "April")
-                    it.dateAndTime.substringAfter("- ").substringBefore(" ")
-                }
+                // Group transactions by month and then sort months
+                val groupedTransactions = content.transactions
+                    .groupBy { transaction ->
+                        // Extraer el nombre del mes y obtener el objeto Month para ordenar
+                        val monthString = transaction.dateAndTime.substringAfter("- ").substringBefore(" ")
+                        // Asumimos que los nombres de los meses en la data están en inglés (e.g., "April")
+                        Month.valueOf(monthString.uppercase(Locale.getDefault()))
+                    }
+                    .toSortedMap(compareByDescending { it }) // Ordenar los meses de forma descendente (ej: April, March)
 
                 // Transactions List
                 LazyColumn(
                     modifier = Modifier.fillMaxSize(),
                     verticalArrangement = Arrangement.spacedBy(10.dp)
                 ) {
-                    groupedTransactions.forEach { (month, transactions) ->
-                        item { MonthHeader(month) }
+                    groupedTransactions.forEach { (monthEnum, transactions) ->
+                        // Convertir Month enum a String capitalizado para el UI
+                        val monthName = monthEnum.getDisplayName(TextStyle.FULL, Locale.getDefault())
+                            .replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString() }
+
+                        item { MonthHeader(monthName) }
 
                         items(transactions) { item ->
                             TransactionItem(
@@ -99,7 +105,7 @@ fun TransactionListScreen(
 }
 
 // =========================================================================
-// HELPER COMPONENTS
+// HELPER COMPONENTS (Ahora incluye la estructura de tarjetas de Figma)
 // =========================================================================
 
 @Composable
@@ -109,10 +115,13 @@ fun CustomHeader(
     onIncomeClick: () -> Unit,
     onExpenseClick: () -> Unit
 ) {
+    // Si activeCardColor es Honeydew, asumimos que es la pantalla de Transacciones (con barra de progreso)
+    val showProgressBar = content.activeCardColor == Honeydew
+
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 24.dp) // Ajuste el padding para centrar
+            .padding(horizontal = 24.dp)
             .padding(top = 8.dp, bottom = 16.dp)
     ) {
         // --- Custom Top Bar ---
@@ -125,66 +134,95 @@ fun CustomHeader(
                 modifier = Modifier.size(28.dp).clickable { navController.popBackStack() }
             )
             Text(content.title, color = FinWiseWhite, fontWeight = FontWeight.SemiBold, fontSize = 18.sp)
-            Icon(painterResource(id = R.drawable.notif_green), contentDescription = "Notifications", tint = FinWiseWhite, modifier = Modifier.size(24.dp))
+            NotificationIcon() // Icono de campana con fondo blanco
         }
 
         // --- Total Balance Card ---
         Card(
-            shape = RoundedCornerShape(12.dp),
+            shape = RoundedCornerShape(16.dp),
             modifier = Modifier.fillMaxWidth().padding(vertical = 12.dp),
-            colors = CardDefaults.cardColors(containerColor = FinWiseWhite) // Usamos FinWiseWhite
+            colors = CardDefaults.cardColors(containerColor = FinWiseWhite), // Fondo blanco
+            elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
         ) {
             Text(
                 "Total Balance",
-                color = FinWiseDarkGreen, // Usamos FinWiseDarkGreen
+                color = FinWiseDarkGreen, // Texto verde oscuro
                 fontSize = 14.sp,
                 textAlign = TextAlign.Center,
-                modifier = Modifier.fillMaxWidth().padding(top = 8.dp)
+                modifier = Modifier.fillMaxWidth().padding(top = 16.dp)
             )
             Text(
                 content.totalBalance,
                 color = Void, // Usamos Void
                 fontWeight = FontWeight.Bold,
-                fontSize = 24.sp,
+                fontSize = 32.sp,
                 textAlign = TextAlign.Center,
-                modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp)
+                modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp)
             )
         }
 
-        // --- Income / Expense Blocks (Clickable) ---
+        // --- Income / Expense Blocks (Figma Style) ---
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             // Income Block
             SummaryBlockCard(
-                title = "Income", amount = content.incomeAmount, iconResId = R.drawable.income_light_green,
-                active = content.activeCardColor == FinWiseGreen, // Usamos FinWiseGreen
-                activeColor = FinWiseGreen, passiveColor = FinWiseDarkGreen, // Colores FinWise
+                title = "Income",
+                amount = content.incomeAmount,
+                iconResId = R.drawable.income_green, // Icono Income
+                activeColor = OceanBlue, // <--- Color visual ACTIVO es OceanBlue
+                active = content.activeCardColor == FinWiseGreen, // <--- Lógica: Activo si la bandera es FinWiseGreen
+                passiveColor = Honeydew,
                 modifier = Modifier.weight(1f).clickable(onClick = onIncomeClick)
             )
             Spacer(Modifier.width(16.dp))
             // Expense Block
             SummaryBlockCard(
-                title = "Expense", amount = content.expenseAmount, iconResId = R.drawable.expense_blue,
-                active = content.activeCardColor == LightBlue, // Usamos LightBlue
-                activeColor = LightBlue, passiveColor = FinWiseDarkGreen, // Colores FinWise
+                title = "Expense",
+                amount = content.expenseAmount,
+                iconResId = R.drawable.expense_blue, // Icono Expense
+                activeColor = OceanBlue, // <--- Color visual ACTIVO es OceanBlue
+                active = content.activeCardColor == OceanBlue, // <--- Lógica: Activo si la bandera es OceanBlue
+                passiveColor = Honeydew,
                 modifier = Modifier.weight(1f).clickable(onClick = onExpenseClick)
             )
         }
+
+        // --- Barra de Progreso (Solo en TransactionsScreen/BalanceScreen) ---
+        if (showProgressBar) {
+            Spacer(Modifier.height(16.dp))
+            ExpenseProgressIndicator(
+                progress = 0.3f,
+                totalLimit = "$20,000.00",
+                percentage = "30%"
+            )
+            Spacer(Modifier.height(16.dp))
+        }
     }
 }
+
 
 @Composable
 fun SummaryBlockCard(
     title: String, amount: String, iconResId: Int, active: Boolean,
     activeColor: Color, passiveColor: Color, modifier: Modifier = Modifier
 ) {
-    // Determine the color scheme based on the active state
-    val blockColor = if (active) activeColor else FinWiseDarkGreen // Usamos FinWiseDarkGreen
-    val textColor = if (active) FinWiseDarkGreen else FinWiseWhite // Texto oscuro si activo, blanco si pasivo
-    val amountColor = if (active) FinWiseDarkGreen else FinWiseWhite // Monto oscuro si activo, blanco si pasivo
-    val backgroundColor = if (active) FinWiseWhite else blockColor.copy(alpha = 0.5f) // Fondo blanco si activo, verde oscuro semi-transparente si pasivo
+    // La lógica de isTransactionScreen ya no es necesaria si el color pasivo siempre es Honeydew.
+
+    val backgroundColor = when {
+        // Caso ACTIVO: Usamos el color OceanBlue
+        active -> activeColor
+        // Caso PASIVO: Usamos Honeydew
+        else -> passiveColor
+    }
+
+    // Colores de texto e ícono
+    // Si está ACTIVO (OceanBlue): Texto/Icono Blanco.
+    // Si está PASIVO (Honeydew): Texto/Icono del color activo (OceanBlue)
+    val iconTint = if (active) FinWiseWhite else activeColor
+    val textColor = if (active) FinWiseWhite else Void
+    val amountColor = if (active) FinWiseWhite else activeColor
 
     Card(
         shape = RoundedCornerShape(20.dp),
@@ -193,7 +231,7 @@ fun SummaryBlockCard(
         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
     ) {
         Column(
-            modifier = Modifier.fillMaxSize().padding(12.dp),
+            modifier = Modifier.fillMaxSize().padding(16.dp), // Aumentamos padding a 16.dp
             horizontalAlignment = Alignment.Start,
             verticalArrangement = Arrangement.SpaceBetween
         ) {
@@ -201,7 +239,7 @@ fun SummaryBlockCard(
             Icon(
                 painter = painterResource(id = iconResId),
                 contentDescription = title,
-                tint = blockColor,
+                tint = iconTint,
                 modifier = Modifier.size(24.dp)
             )
 
@@ -218,4 +256,3 @@ fun SummaryBlockCard(
         }
     }
 }
-
