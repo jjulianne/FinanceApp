@@ -3,6 +3,7 @@ package com.example.financeapp.ui.screens.security
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.financeapp.domain.repository.SettingsRepository
+import com.example.financeapp.ui.screens.security.ChangePinUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -11,19 +12,6 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-
-data class ChangePinUiState(
-    val currentPin: String = "",
-    val newPin: String = "",
-    val confirmPin: String = "",
-    val isCurrentPinVisible: Boolean = false,
-    val isNewPinVisible: Boolean = false,
-    val isConfirmPinVisible: Boolean = false,
-    val isLoading: Boolean = false,
-    val errorMessage: String? = null,
-    val showSuccess: Boolean = false,
-    val isButtonEnabled: Boolean = false
-)
 
 @HiltViewModel
 class ChangePinViewModel @Inject constructor(
