@@ -169,9 +169,6 @@ fun FinWiseNavigation(
                 darkTheme = isDarkTheme,
                 onThemeChange = onThemeChange,
                 onNavigateBack = { navController.popBackStack() },
-                onUpdateProfile = {
-                    navController.popBackStack()
-                },
 
                 // Callbacks del BottomNavBar
                 onNavigateToHome = { navController.navigate(Screen.Home.route) { popUpTo(navController.graph.startDestinationRoute!!) { saveState = true } } },
