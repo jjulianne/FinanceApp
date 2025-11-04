@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.financeapp.domain.repository.Chat
 import com.example.financeapp.domain.repository.ChatRepository
+import com.example.financeapp.ui.screens.help.OnlineSupportUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -11,11 +12,6 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import javax.inject.Inject
 
-data class OnlineSupportUiState(
-    val activeChats: List<Chat> = emptyList(),
-    val endedChats: List<Chat> = emptyList(),
-    val isLoading: Boolean = true
-)
 
 @HiltViewModel
 class OnlineSupportViewModel @Inject constructor(
