@@ -73,10 +73,12 @@ class AuthViewModel @Inject constructor(
     /**
      * Cierra sesión (opcional)
      */
-    fun logout() {
+    fun logout(onSuccess: () -> Unit) {
         viewModelScope.launch {
             authRepository.logout() // 🔹 borra la sesión en Room
             _isLoggedIn.value = false
+            onSuccess()
+
         }
     }
 
