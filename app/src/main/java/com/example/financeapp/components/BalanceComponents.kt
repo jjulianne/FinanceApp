@@ -23,7 +23,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.material.icons.filled.Notifications
-
 import com.example.financeApp.R
 import com.example.financeapp.ui.theme.* // Importamos los colores de FinWise
 
@@ -31,14 +30,13 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
 
-
+import androidx.compose.material3.MaterialTheme
 
 import androidx.compose.runtime.*
 
 
-// --- Colores de la barra de progreso (Usando Void) ---
-val ProgressTrackColor = FinWiseWhite // Fondo blanco
-val ProgressIndicatorColor = Void // Progreso muy oscuro (usando Void)
+// val ProgressTrackColor = FinWiseWhite // Se movió dentro de ExpenseProgressIndicator
+// val ProgressIndicatorColor = ...
 
 // --- 1. Notification Icon (Con fondo blanco) ---
 @Composable
@@ -82,14 +80,16 @@ fun BalanceHeaderItem(
 
             Text(
                 text = title,
-                color = Void,
+                // TODO: Reemplaza esto con tu nuevo color de texto principal
+                color = MaterialTheme.colorScheme.onSurface, // Era Void
                 fontSize = 14.sp
             )
         }
 
         Text(
             text = amount,
-            color = if (isExpense) OceanBlue else Honeydew,
+            // TODO: Reemplaza esto con tu nuevo color "activo"
+            color = if (isExpense) MaterialTheme.colorScheme.primary else Honeydew, // Era OceanBlue
             fontWeight = FontWeight.Bold,
             fontSize = 24.sp
         )
@@ -107,19 +107,23 @@ fun ExpenseProgressIndicator(
 ) {
     val safeProgress = progress.coerceIn(0f, 1f)
 
+    val progressTrackColor = FinWiseWhite // Fondo blanco
+    // TODO: Reemplaza esto con tu nuevo color de texto principal
+    val progressIndicatorColor = MaterialTheme.colorScheme.onSurface // Progreso muy oscuro (usando Void)
+
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 38.dp),
 
-    ) {
+        ) {
         // Contenedor de la barra de progreso
         Box(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(24.dp)
                 .clip(RoundedCornerShape(50))
-                .background(ProgressTrackColor)
+                .background(progressTrackColor) // <-- Usa la variable local
         ) {
             // Sección de progreso
             Box(
@@ -127,7 +131,7 @@ fun ExpenseProgressIndicator(
                     .fillMaxHeight()
                     .fillMaxWidth(safeProgress)
                     .clip(RoundedCornerShape(50))
-                    .background(ProgressIndicatorColor)
+                    .background(progressIndicatorColor) // <-- Usa la variable local
                     .padding(horizontal = 12.dp),
                 contentAlignment = Alignment.CenterStart
             ) {
@@ -135,7 +139,7 @@ fun ExpenseProgressIndicator(
                 if (safeProgress > 0.15f) {
                     Text(
                         text = percentage,
-                        color = ProgressTrackColor,
+                        color = progressTrackColor, // <-- Usa la variable local
                         fontSize = 12.sp,
                         fontWeight = FontWeight.SemiBold
                     )
@@ -152,7 +156,7 @@ fun ExpenseProgressIndicator(
             ) {
                 Text(
                     text = totalLimit,
-                    color = ProgressIndicatorColor,
+                    color = progressIndicatorColor, // <-- Usa la variable local
                     fontSize = 12.sp,
                     fontWeight = FontWeight.SemiBold
                 )
@@ -169,13 +173,15 @@ fun ExpenseProgressIndicator(
             Icon(
                 painter = painterResource(id = iconResId),
                 contentDescription = "Good",
-                tint = Void,
+                // TODO: Reemplaza esto con tu nuevo color de texto principal
+                tint = MaterialTheme.colorScheme.onSurface, // Era Void
                 modifier = Modifier.size(16.dp)
             )
             Spacer(Modifier.width(8.dp))
             Text(
                 text = "$percentage Of Your Expenses, Looks Good.",
-                color = Void,
+                // TODO: Reemplaza esto con tu nuevo color de texto principal
+                color = MaterialTheme.colorScheme.onSurface, // Era Void
                 fontSize = 15.sp
             )
         }
@@ -191,7 +197,8 @@ fun MonthHeader(month: String) {
         horizontalArrangement = Arrangement.Start
     ) {
         // Texto más oscuro (Void)
-        Text(month, fontWeight = FontWeight.SemiBold, fontSize = 22.sp, color = Void)
+        // TODO: Reemplaza esto con tu nuevo color de texto principal
+        Text(month, fontWeight = FontWeight.SemiBold, fontSize = 22.sp, color = MaterialTheme.colorScheme.onSurface) // Era Void
     }
 }
 
@@ -212,14 +219,20 @@ fun TransactionItem(
 
     // 2. Determinación dinámica del color de fondo del ícono
     val iconBackgroundColor = if (isPressed) {
-        OceanBlue // Si está presionado, usa OceanBlue
+        // TODO: Reemplaza esto con tu nuevo color "activo"
+        MaterialTheme.colorScheme.primary // Si está presionado, usa OceanBlue
     } else {
-        VividBlue // Color normal
+        // --- CORRECCIÓN 4: 'VividBlue' no existe ---
+        // TODO: Reemplaza esto con tu color de fondo de ícono normal
+        MaterialTheme.colorScheme.secondaryContainer // Era VividBlue
+        // --- FIN CORRECCIÓN 4 ---
     }
 
     // Asumimos que Honeydew es el color correcto para el ícono
     val iconTint = Honeydew
-    val finalAmountColor = if (amount.contains("-")) LightBlue else amountColor
+    // TODO: Reemplaza esto con tu color para montos negativos (gastos)
+    // (Usando 'error' (rojo) como un placeholder claro para valores negativos)
+    val finalAmountColor = if (amount.contains("-")) MaterialTheme.colorScheme.error else amountColor // Era LightBlue
 
     Card(
         shape = RoundedCornerShape(16.dp),
@@ -260,7 +273,8 @@ fun TransactionItem(
 
             // Details Column (Title and Date)
             Column(modifier = Modifier.width(100.dp)) {
-                Text(title, fontWeight = FontWeight.SemiBold, fontSize = 16.sp, color = Void)
+                // TODO: Reemplaza esto con tu nuevo color de texto principal
+                Text(title, fontWeight = FontWeight.SemiBold, fontSize = 16.sp, color = MaterialTheme.colorScheme.onSurface) // Era Void
                 Text(dateAndTime, fontSize = 12.sp, color = FinWiseDarkGreen)
             }
             // Separador Verde Fino 1
@@ -297,7 +311,7 @@ fun TransactionItem(
                 // Monto
                 Text(
                     amount,
-                    color = finalAmountColor,
+                    color = finalAmountColor, // <-- Usa la variable corregida
                     fontWeight = FontWeight.Bold,
                     fontSize = 14.sp,
                     modifier = Modifier.width(80.dp),

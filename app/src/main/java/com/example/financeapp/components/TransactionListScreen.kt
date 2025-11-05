@@ -1,3 +1,5 @@
+package com.example.financeapp.components // Asumo el paquete por la ruta del error
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -39,13 +41,31 @@ import java.util.Locale
 
 @Composable
 fun TransactionListScreen(
-    navController: NavController,
+    navController: NavController, // Sigue siendo util para el "Back"
     content: ScreenContent,
     onIncomeClick: () -> Unit, // Navigation callback for Income
-    onExpenseClick: () -> Unit // Navigation callback for Expense
+    onExpenseClick: () -> Unit, // Navigation callback for Expense
+
+    currentRoute: String,
+    darkTheme: Boolean,
+    onNavigateToHome: () -> Unit,
+    onNavigateToAnalysis: () -> Unit,
+    onNavigateToTransactions: () -> Unit,
+    onNavigateToCategory: () -> Unit,
+    onNavigateToProfile: () -> Unit
 ) {
     Scaffold(
-        bottomBar = { BottomNavBar(navController = navController) },
+        bottomBar = {
+            BottomNavBar(
+                currentRoute = currentRoute,
+                darkTheme = darkTheme,
+                onNavigateToHome = onNavigateToHome,
+                onNavigateToAnalysis = onNavigateToAnalysis,
+                onNavigateToTransactions = onNavigateToTransactions,
+                onNavigateToCategory = onNavigateToCategory,
+                onNavigateToProfile = onNavigateToProfile
+            )
+        },
         containerColor = FinWiseGreen // Usamos FinWiseGreen
     ) { padding ->
         Column(
@@ -182,7 +202,8 @@ fun CustomHeader(
             )
             Text(
                 content.totalBalance,
-                color = Void, // Usamos Void
+                // TODO: CORRECCIÓN: Reemplazado 'Void' (que no compilaba). Restaura tu color de texto principal aquí.
+                color = MaterialTheme.colorScheme.onSurface, // Usamos Void
                 fontWeight = FontWeight.Bold,
                 fontSize = 32.sp,
                 textAlign = TextAlign.Center,
@@ -200,7 +221,8 @@ fun CustomHeader(
                 title = "Income",
                 amount = content.incomeAmount,
                 iconResId = R.drawable.income_light_green, // Icono Income
-                activeColor = OceanBlue, // <--- Color visual ACTIVO es OceanBlue
+                // TODO: CORRECCIÓN: Reemplazado 'OceanBlue' (que no compilaba). Restaura tu color "activo" aquí.
+                activeColor = MaterialTheme.colorScheme.primary, // <--- Color visual ACTIVO es OceanBlue
                 active = content.activeCardColor == FinWiseGreen, // <--- Lógica: Activo si la bandera es FinWiseGreen
                 passiveColor = Honeydew,
                 modifier = Modifier.weight(1f).clickable(onClick = onIncomeClick)
@@ -211,8 +233,8 @@ fun CustomHeader(
                 title = "Expense",
                 amount = content.expenseAmount,
                 iconResId = R.drawable.expense_blue, // Icono Expense
-                activeColor = OceanBlue, // <--- Color visual ACTIVO es OceanBlue
-                active = content.activeCardColor == OceanBlue, // <--- Lógica: Activo si la bandera es OceanBlue
+                activeColor = MaterialTheme.colorScheme.primary, // <--- Color visual ACTIVO es OceanBlue
+                active = content.activeCardColor == MaterialTheme.colorScheme.primary, // <--- Lógica: Activo si la bandera es OceanBlue
                 passiveColor = Honeydew,
                 modifier = Modifier.weight(1f).clickable(onClick = onExpenseClick)
             )
@@ -237,7 +259,7 @@ fun SummaryBlockCard(
     }
 
     // Colores de texto e ícono
-    val textColor = if (active) FinWiseWhite else Void
+    val textColor = if (active) FinWiseWhite else MaterialTheme.colorScheme.onSurface
     val amountColor = if (active) FinWiseWhite else activeColor
 
     // Si activo, el ícono es blanco. Si inactivo, usa el color original del drawable (Color.Unspecified).
@@ -264,6 +286,7 @@ fun SummaryBlockCard(
 
             // Text Details
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                // Esta línea (la del .copy) ahora compilará porque 'textColor' es un Color válido
                 Text(title, fontSize = 16.sp, color = textColor.copy(alpha = 0.8f))
                 Text(
                     amount,

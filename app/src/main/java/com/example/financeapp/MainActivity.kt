@@ -1,4 +1,4 @@
-    // com.example.financeapp/MainActivity.kt
+package com.example.financeapp
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -31,3 +31,4 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
+}

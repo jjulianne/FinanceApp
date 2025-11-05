@@ -22,7 +22,8 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.financeapp.components.BottomNavBar
 import com.example.financeapp.core.* // For colors, AllTransactions etc.
-import com.example.financeApp.R // Your project R class import
+// --- CORRECCIÓN 1: Import del paquete R (minúscula) ---
+import com.example.financeApp.R
 import com.example.financeapp.components.* // 💡 FIX: Import all helper functions
 
 import com.example.financeapp.ui.theme.*
@@ -35,11 +36,34 @@ import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
 @Composable
-fun AccountBalanceScreen(navController: NavController) {
+fun AccountBalanceScreen(
+    navController: NavController,
+    // --- CORRECCIÓN 2: Añadidos parámetros para BottomNavBar ---
+    darkTheme: Boolean,
+    currentRoute: String,
+    onNavigateToHome: () -> Unit,
+    onNavigateToAnalysis: () -> Unit,
+    onNavigateToTransactions: () -> Unit,
+    onNavigateToCategory: () -> Unit,
+    onNavigateToProfile: () -> Unit
+    // --- FIN CORRECCIÓN 2 ---
+) {
     Scaffold(
         // The main container color of the Scaffold is the header green
         containerColor = FinWiseGreen,
-        bottomBar = { BottomNavBar(navController = navController) }
+        // --- CORRECCIÓN 3: Pasamos los nuevos parámetros al BottomNavBar ---
+        bottomBar = {
+            BottomNavBar(
+                currentRoute = currentRoute,
+                darkTheme = darkTheme,
+                onNavigateToHome = onNavigateToHome,
+                onNavigateToAnalysis = onNavigateToAnalysis,
+                onNavigateToTransactions = onNavigateToTransactions,
+                onNavigateToCategory = onNavigateToCategory,
+                onNavigateToProfile = onNavigateToProfile
+            )
+        }
+        // --- FIN CORRECCIÓN 3 ---
     ) { padding ->
         Column(
             modifier = Modifier
@@ -152,14 +176,20 @@ fun BalanceHeader(navController: NavController) {
         ) {
             Text(
                 "Total Balance",
-                color = Void,
+                // --- CORRECCIÓN 4: 'Void' no existe, usamos un color temporal ---
+                // TODO: Reemplaza esto con tu nuevo color de texto principal (ej. GreyText)
+                color = MaterialTheme.colorScheme.onSurface, // Era Void
+                // --- FIN CORRECCIÓN 4 ---
                 fontSize = 15.sp,
                 textAlign = TextAlign.Center,
                 modifier = Modifier.fillMaxWidth().padding(top = 16.dp)
             )
             Text(
                 "$7,783.00",
-                color = Void,
+                // --- CORRECCIÓN 5: 'Void' no existe, usamos un color temporal ---
+                // TODO: Reemplaza esto con tu nuevo color de texto principal (ej. GreyText)
+                color = MaterialTheme.colorScheme.onSurface, // Era Void
+                // --- FIN CORRECCIÓN 5 ---
                 fontWeight = FontWeight.Bold,
                 fontSize = 24.sp,
                 textAlign = TextAlign.Center,
@@ -198,6 +228,16 @@ fun BalanceHeader(navController: NavController) {
 @Preview(showBackground = true, widthDp = 430, heightDp = 932)
 @Composable
 fun AccountBalanceScreenPreview() {
-    // NavController simulado
-    AccountBalanceScreen(navController = rememberNavController())
+    // --- CORRECCIÓN 6: El Preview también necesita los nuevos parámetros ---
+    AccountBalanceScreen(
+        navController = rememberNavController(),
+        darkTheme = false,
+        currentRoute = "balance_route", // Ruta de ejemplo para el preview
+        onNavigateToHome = {},
+        onNavigateToAnalysis = {},
+        onNavigateToTransactions = {},
+        onNavigateToCategory = {},
+        onNavigateToProfile = {}
+    )
+    // --- FIN CORRECCIÓN 6 ---
 }
