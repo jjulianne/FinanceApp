@@ -1,181 +1,218 @@
 package com.example.financeapp.components
 
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.material3.Icon
-import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarItem
-import androidx.compose.material3.NavigationBarItemDefaults
-import androidx.compose.material3.Surface
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.res.painterResource
-import androidx.navigation.NavController
-import androidx.navigation.compose.currentBackStackEntryAsState
-import com.example.financeapp.navigation.BottomNavItem
-import com.example.financeApp.R
-import androidx.compose.foundation.shape.RoundedCornerShape
-import com.example.financeapp.ui.theme.*
 import androidx.compose.foundation.background
-import androidx.compose.ui.Alignment
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
+import com.example.financeApp.R
+import com.example.financeapp.ui.theme.FinanceAppTheme
 
-
+/**
+ * Bottom Navigation Bar component con forma curva
+ * Este componente se reutiliza en todas las pantallas principales
+ */
 @Composable
-fun BottomNavBar(navController: NavController) {
-    val items = listOf(
-        BottomNavItem.Home,
-        BottomNavItem.Stats, // Segundo icono: Stats/Análisis
-        BottomNavItem.Transfer, // Tercer icono: Transfer/Transacciones
-        BottomNavItem.Wallet,
-        BottomNavItem.Profile,
-    )
+fun BottomNavBar(
+    currentRoute: String,
+    darkTheme: Boolean,
+    onNavigateToHome: () -> Unit,
+    onNavigateToAnalysis: () -> Unit,
+    onNavigateToTransactions: () -> Unit,
+    onNavigateToCategory: () -> Unit,
+    onNavigateToProfile: () -> Unit
+) {
 
-    val navBackStackEntry by navController.currentBackStackEntryAsState()
-    val currentRoute = navBackStackEntry?.destination?.route
+    val backgroundColor = if (!darkTheme) {
+        MaterialTheme.colorScheme.surfaceVariant
+    } else {
+        MaterialTheme.colorScheme.surfaceVariant
+    }
 
-    val bottomBarRoutes = items.map { it.route }
+    // El Box contenedor principal.
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(108.dp)
+            .clip(RoundedCornerShape(topStart = 70.dp, topEnd = 70.dp))
+            .background(backgroundColor)
+            .padding(
+                top = 36.dp,
+                start = 60.dp,
+                end = 60.dp,
+                bottom = 41.dp
+            )
+    ) {
+        // El Row con SpaceBetween es correcto para esparcir los items
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            // Home
+            NavBarItem(
+                icon = R.drawable.home_nav,
+                iconWidth = 25.dp,
+                iconHeight = 31.dp,
+                isSelected = currentRoute == "home_route",
+                darkTheme = darkTheme,
+                onClick = onNavigateToHome
+            )
 
-    // Rutas del grupo Transacciones (Botón central)
-    val transferRoutes = listOf(
-        BottomNavItem.Transfer.route, // "transfer_route"
-        "income_route",
-        "expense_route"
-    )
+            // Analysis
+            NavBarItem(
+                icon = R.drawable.analysis_nav,
+                iconWidth = 31.dp,
+                iconHeight = 30.dp,
+                isSelected = currentRoute == "analysis_route",
+                darkTheme = darkTheme,
+                onClick = onNavigateToAnalysis
+            )
 
-    // Rutas que activan el botón Stats (Ahora solo home_route)
-    val statsRoutes = listOf(
-        BottomNavItem.Home.route, // La pantalla de Balance/Home
-        BottomNavItem.Stats.route // La propia ruta Stats, si existiera
-    )
+            // Transactions
+            NavBarItem(
+                icon = R.drawable.transaction_nav,
+                iconWidth = 33.dp,
+                iconHeight = 25.dp,
+                isSelected = currentRoute == "transactions_route",
+                darkTheme = darkTheme,
+                onClick = onNavigateToTransactions
+            )
 
-    val transferTargetRoute = BottomNavItem.Transfer.route // "transfer_route"
-    // Nuevo Target: El clic en Stats debe ir a Home/Balance
-    val statsTargetRoute = BottomNavItem.Home.route
+            // Category
+            NavBarItem(
+                icon = R.drawable.category_nav,
+                iconWidth = 27.dp,
+                iconHeight = 23.dp,
+                isSelected = currentRoute == "category_route",
+                darkTheme = darkTheme,
+                onClick = onNavigateToCategory
+            )
 
-    // --- FUNCIÓN DE NAVEGACIÓN AUXILIAR DEFINIDA AQUÍ ---
-    val defaultNavigation = { route: String ->
-        navController.navigate(route) {
-            // popUpTo DEBE usar la primera ruta de la barra (home_route)
-            popUpTo(bottomBarRoutes.first()) {
-                saveState = true
-            }
-            launchSingleTop = true
-            restoreState = true
+            // Profile
+            NavBarItem(
+                icon = R.drawable.profile_nav,
+                iconWidth = 22.dp,
+                iconHeight = 27.dp,
+                isSelected = currentRoute == "profile_route",
+                darkTheme = darkTheme,
+                onClick = onNavigateToProfile
+            )
         }
     }
-    // ----------------------------------------------------
+}
+
+/**
+ * Item individual de la barra de navegacion
+ * Modificado para aceptar tamaños de icono variables
+ */
+@Composable
+private fun NavBarItem(
+    icon: Int,
+    iconWidth: Dp,
+    iconHeight: Dp,
+    isSelected: Boolean,
+    darkTheme: Boolean,
+    onClick: () -> Unit
+) {
 
 
-    Surface(
-        color = FinWiseLightGreen, // Fondo verde claro de la barra (Honeydew)
-        modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(topStart = 32.dp, topEnd = 32.dp) // Solo esquinas superiores redondeadas
-    ) {
-        NavigationBar(
-            containerColor = Color.Transparent, // El color lo da el Surface padre
-            tonalElevation = 0.dp,
-            modifier = Modifier.height(72.dp)
-        ) {
-            items.forEach { item ->
+    // No Seleccionado: Color "on" del fondo de la barra
+    val unselectedTint = if (!darkTheme) {
+        MaterialTheme.colorScheme.onSurfaceVariant // (Oscuro en modo claro)
+    } else {
+        MaterialTheme.colorScheme.onSurface // (Claro en modo oscuro)
+    }
 
-                // --- LÓGICA DE ACTIVACIÓN (isSelected) ---
-                val isSelected = when (item.route) {
-                    // El botón de Transferencia se activa si la ruta actual está en el grupo transferRoutes
-                    BottomNavItem.Transfer.route -> currentRoute in transferRoutes
+    // Seleccionado: Color del fondo de la barra (para contrastar con el verde)
+    // (Esto será 'Cyprus' en ambos modos, según tu tema)
+    val selectedTint = if (!darkTheme) {
+        MaterialTheme.colorScheme.onSurfaceVariant // (Oscuro en modo claro)
+    } else {
+        MaterialTheme.colorScheme.surface // (Oscuro en modo oscuro)
+    }
 
-                    // CORRECCIÓN: El botón Stats/Análisis se activa si la ruta actual es Home/Balance
-                    BottomNavItem.Stats.route -> currentRoute in statsRoutes
+    // Asignamos el tinte correcto
+    val iconTint = if (isSelected) selectedTint else unselectedTint
 
-                    // Los demás botones (Home, Wallet, Profile) se activan si la ruta coincide exactamente.
-                    else -> item.route == currentRoute
+    // Box contenedor del item (el "reborde seleccionado")
+    Box(
+        contentAlignment = Alignment.Center,
+        modifier = Modifier
+            .size(57.dp, 53.dp) // Mantenemos el tamaño para el área de click
+            .then(
+                if (isSelected) {
+                    Modifier
+                        .clip(RoundedCornerShape(22.dp))
+                        // Usamos el color primario (#00D09E) como fondo
+                        .background(MaterialTheme.colorScheme.primary)
+                } else {
+                    Modifier
                 }
-
-                // --- CORRECCIÓN: Color de fondo del indicador (Stats y Transfer) ---
-                val indicatorColor =
-                    if (isSelected && (item.route == BottomNavItem.Transfer.route || item.route == BottomNavItem.Stats.route)) {
-                        FinWiseGreen // Verde activado para ambos grupos principales
-                    } else {
-                        Color.Transparent
-                    }
-
-                // Color del icono
-                val iconColor =
-                    if (isSelected && (item.route == BottomNavItem.Transfer.route || item.route == BottomNavItem.Stats.route)) {
-                        FinWiseWhite // Blanco sobre indicador verde
-                    } else if (isSelected) {
-                        FinWiseDarkGreen // Oscuro para contraste con barra clara
-                    } else {
-                        FinWiseDarkGreen.copy(alpha = 0.6f) // No seleccionado
-                    }
-
-
-                // --- LÓGICA DE CLICK Y NAVEGACIÓN ---
-                val finalOnClickAction: () -> Unit = when (item.route) {
-                    BottomNavItem.Transfer.route -> {
-                        { // transferNavigation
-                            // Si la ruta actual es Income/Expense, forzamos popUpTo Transfer para volver a la principal
-                            if (currentRoute in transferRoutes && currentRoute != transferTargetRoute) {
-                                navController.navigate(transferTargetRoute) {
-                                    popUpTo(transferTargetRoute) { inclusive = false }
-                                    launchSingleTop = true
-                                    restoreState = true
-                                }
-                            } else {
-                                // Si ya estamos en transfer_route o la ruta es diferente, usamos la navegación normal.
-                                defaultNavigation(transferTargetRoute)
-                            }
-                        }
-                    }
-                    BottomNavItem.Stats.route -> {
-                        {
-                            // CORRECCIÓN: El clic del botón Stats navega a la ruta de Balance/Home
-                            if (currentRoute != statsTargetRoute) {
-                                defaultNavigation(statsTargetRoute)
-                            }
-                        }
-                    }
-                    else -> {
-                        {
-                            // Si el botón no es Transfer ni Stats, simplemente navegamos a su ruta
-                            defaultNavigation(item.route)
-                        }
-                    }
-                }
-
-
-                NavigationBarItem(
-                    onClick = finalOnClickAction,
-                    selected = isSelected,
-                    icon = {
-                        Box(
-                            modifier = Modifier
-                                .size(48.dp)
-                                .clip(RoundedCornerShape(12.dp))
-                                .background(indicatorColor),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Icon(
-                                painter = painterResource(id = item.icon),
-                                contentDescription = item.label,
-                                tint = iconColor,
-                                modifier = Modifier.size(24.dp)
-                            )
-                        }
-                    },
-                    label = null,
-                    colors = NavigationBarItemDefaults.colors(
-                        selectedIconColor = Color.Transparent,
-                        unselectedIconColor = Color.Transparent,
-                        indicatorColor = Color.Transparent
-                    )
-                )
+            )
+            .clickable(
+                indication = null,
+                interactionSource = remember { MutableInteractionSource() }
+            ) {
+                onClick()
             }
-        }
+    ) {
+        // Icono
+        Icon(
+            painter = painterResource(id = icon),
+            contentDescription = null,
+            modifier = Modifier.size(width = iconWidth, height = iconHeight),
+            tint = iconTint
+        )
+    }
+}
+
+
+@Preview(name = "BottomBar Light (Profile)", showBackground = true, widthDp = 430)
+@Composable
+fun BottomNavBarLightPreview() {
+    FinanceAppTheme(darkTheme = false) {
+        BottomNavBar(
+            currentRoute = "profile_route",
+            darkTheme = false,
+            onNavigateToHome = {},
+            onNavigateToAnalysis = {},
+            onNavigateToTransactions = {},
+            onNavigateToCategory = {},
+            onNavigateToProfile = {}
+        )
+    }
+}
+
+@Preview(name = "BottomBar Dark (Home)", showBackground = true, widthDp = 430)
+@Composable
+fun BottomNavBarDarkPreview() {
+    FinanceAppTheme(darkTheme = true) {
+        BottomNavBar(
+            currentRoute = "home_route",
+            darkTheme = true,
+            onNavigateToHome = {},
+            onNavigateToAnalysis = {},
+            onNavigateToTransactions = {},
+            onNavigateToCategory = {},
+            onNavigateToProfile = {}
+        )
     }
 }

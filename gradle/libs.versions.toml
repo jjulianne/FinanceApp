@@ -1,7 +1,9 @@
 [versions]
 # Versiones base
-agp = "8.12.3"
+agp = "8.12.2"
+converterGson = "3.0.0"
 kotlin = "2.1.10"
+datastorePreferences = "1.1.1"
 
 # AndroidX principales
 coreKtx = "1.17.0"
@@ -36,6 +38,11 @@ navigationTesting = "2.9.5"
 hiltTesting = "2.57.2"
 coroutinesTest = "1.10.2"
 navigationRuntimeKtx = "2.9.5"
+uiText = "1.9.4"
+foundationLayout = "1.9.4"
+material3 = "1.4.0"
+uiGraphics = "1.9.4"
+foundation = "1.9.4"
 
 
 [libraries]
@@ -60,6 +67,7 @@ androidx-lifecycle-viewmodel-compose = { group = "androidx.lifecycle", name = "l
 
 # Navegacion
 androidx-navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navigationCompose" }
+converter-gson = { module = "com.squareup.retrofit2:converter-gson", version.ref = "converterGson" }
 navigation-testing = { group = "androidx.navigation", name = "navigation-testing", version.ref = "navigationTesting" }
 
 # Hilt
@@ -86,6 +94,13 @@ androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-co
 truth = { group = "com.google.truth", name = "truth", version.ref = "truth" }
 runner = { group = "androidx.test", name = "runner", version.ref = "runner" }
 androidx-navigation-runtime-ktx = { group = "androidx.navigation", name = "navigation-runtime-ktx", version.ref = "navigationRuntimeKtx" }
+androidx-foundation-layout = { group = "androidx.compose.foundation", name = "foundation-layout", version.ref = "foundationLayout" }
+androidx-ui-text = { group = "androidx.compose.ui", name = "ui-text", version.ref = "uiText" }
+material3 = { group = "androidx.compose.material3", name = "material3", version.ref = "material3" }
+ui-graphics = { group = "androidx.compose.ui", name = "ui-graphics", version.ref = "uiGraphics" }
+androidx-foundation = { group = "androidx.compose.foundation", name = "foundation", version.ref = "foundation" }
+androidx-compose-foundation-layout = { group = "androidx.compose.foundation", name = "foundation-layout", version.ref = "foundationLayout" }
+androidx-datastore-preferences = { group = "androidx.datastore", name = "datastore-preferences", version.ref = "datastorePreferences" }
 
 
 [plugins]
