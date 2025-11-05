@@ -25,6 +25,9 @@ import com.example.financeapp.ui.screens.auth.SecurityPinScreen
 import com.example.financeapp.ui.screens.home.HomeScreen
 
 
+import com.example.financeapp.ui.screens.profile.ProfileScreen
+import com.example.financeapp.ui.screens.profile.edit_profile.EditProfileScreen
+
 
 // Definicion de rutas de navegacion de la aplicacion
 sealed class Screen(val route: String) {
@@ -50,6 +53,7 @@ sealed class Screen(val route: String) {
 
     // Rutas de Perfil y Configuración
     object Profile : Screen("profile_route")
+    object EditProfile : Screen("edit_profile_route")
     object Settings : Screen("settings_route")
     object Security : Screen("security_route")
 
@@ -61,6 +65,8 @@ sealed class Screen(val route: String) {
 
 @Composable
 fun FinWiseNavigation(
+    isDarkTheme: Boolean,
+    onThemeChange: (Boolean) -> Unit,
     navController: NavHostController = rememberNavController(),
     startDestination: String = Screen.Splash.route
 ) {
@@ -131,6 +137,7 @@ fun FinWiseNavigation(
                 }
             )
         }
+
         // Rutas de Autenticacion
 
         //Login
@@ -181,7 +188,6 @@ fun FinWiseNavigation(
                     navController.navigate(Screen.Login.route)
                 },
                 onResetPassword = {
-                    // 👇 Cuando el usuario toca "Next step", lo mandamos al PIN screen
                     navController.navigate(Screen.Security.route)
                 },
                 onNavigateToSignUp = {
@@ -246,6 +252,46 @@ fun FinWiseNavigation(
         // Aca van mas pantallas (ejemplo)
         composable(Screen.SavingGoals.route) {
             PlaceholderScreen("Saving Goals Screen") // Falta la logica
+        }
+
+        composable(Screen.Profile.route) {
+            ProfileScreen(
+                currentRoute = Screen.Profile.route,
+                darkTheme = isDarkTheme,
+                onNavigateBack = { navController.popBackStack() },
+                onNavigateToEditProfile = { navController.navigate(route = Screen.EditProfile.route) },
+                onNavigateToSecurity = { /* Falta implementar */ },
+                onNavigateToSettings = { /* Falta implementar */ },
+                onNavigateToHelp = { /* Falta implementar */ },
+                onLogout = { /* Falta implementar */ },
+
+                // Callbacks del BottomNavBar
+                // (Usamos popUpTo para evitar apilar pantallas)
+                onNavigateToHome = { navController.navigate(Screen.Home.route) { popUpTo(navController.graph.startDestinationRoute!!) { saveState = true } } },
+                onNavigateToAnalysis = { /* Falta implementar */ },
+                onNavigateToTransactions = { /* Falta implementar */ },
+                onNavigateToCategory = { /* Falta implementar */ },
+                onNavigateToProfile = { /* Ya estás aquí */ }
+            )
+        }
+
+        composable(Screen.EditProfile.route) {
+            EditProfileScreen(
+                currentRoute = Screen.Profile.route, // Mantenemos el ícono de perfil seleccionado
+                darkTheme = isDarkTheme,
+                onThemeChange = onThemeChange,
+                onNavigateBack = { navController.popBackStack() },
+                onUpdateProfile = {
+                    navController.popBackStack()
+                },
+
+                // Callbacks del BottomNavBar
+                onNavigateToHome = { navController.navigate(Screen.Home.route) { popUpTo(navController.graph.startDestinationRoute!!) { saveState = true } } },
+                onNavigateToAnalysis = { /* Falta implementar */ },
+                onNavigateToTransactions = { /* Falta implementar */ },
+                onNavigateToCategory = { /* Falta implementar */ },
+                onNavigateToProfile = { navController.popBackStack() } // Simplemente volvemos
+            )
         }
     }
 }
