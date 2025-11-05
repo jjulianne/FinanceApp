@@ -68,6 +68,13 @@ dependencies {
     implementation(libs.hilt.navigation.compose)
 
     // INYECCION DE DEPENDENCIAS (HILT)
+    implementation(libs.hilt)
+    implementation(libs.androidx.navigation.runtime.ktx)
+    implementation(libs.androidx.ui.text)
+    implementation(libs.androidx.foundation.layout)
+    implementation(libs.material3)
+    implementation(libs.ui.graphics)
+    implementation(libs.androidx.foundation)           // Biblioteca principal de Hilt
     implementation(libs.hilt)           // Biblioteca principal de Hilt
     implementation(libs.androidx.navigation.runtime.ktx)
     implementation(libs.androidx.compose.foundation.layout)
@@ -82,6 +89,9 @@ dependencies {
     // SERIALIZACION
     implementation(libs.serialization)          // Kotlinx Serialization
 
+    // Retrofit
+    implementation("com.squareup.retrofit2:retrofit:2.9.0")
+    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
     // PRUEBAS (TESTS)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

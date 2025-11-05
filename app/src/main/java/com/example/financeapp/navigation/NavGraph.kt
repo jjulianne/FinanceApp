@@ -1,5 +1,6 @@
 package com.example.financeapp.navigation
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Text
@@ -7,6 +8,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -17,6 +19,13 @@ import com.example.financeapp.ui.screens.launch.Onboarding1Screen
 import com.example.financeapp.ui.screens.launch.Onboarding2Screen
 import com.example.financeapp.ui.screens.launch.WelcomeScreen
 import com.example.financeapp.ui.screens.launch.SplashScreen
+import com.example.financeapp.ui.screens.auth.LoginScreen
+import com.example.financeapp.ui.screens.auth.SignUpScreen
+import com.example.financeapp.ui.screens.auth.ForgotPasswordScreen
+import com.example.financeapp.ui.screens.auth.NewPasswordScreen
+import com.example.financeapp.ui.screens.auth.PasswordChangedSuccessScreen
+import com.example.financeapp.ui.screens.auth.SecurityPinScreen
+import com.example.financeapp.ui.screens.home.HomeScreen
 import com.example.financeapp.ui.screens.profile.ProfileScreen
 import com.example.financeapp.ui.screens.profile.edit_profile.EditProfileScreen
 import com.example.financeapp.ui.screens.settings.SettingsScreen
@@ -41,12 +50,20 @@ sealed class Screen(val route: String) {
     object Onboarding1 : Screen("onboarding1_route")         // Primera pantalla de onboarding
     object Onboarding2 : Screen("onboarding2_route")         // Segunda pantalla de onboarding
     object Welcome : Screen("welcome_route")                 // Pantalla de bienvenida (Log In / Sign Up)
-    object Home : Screen("home_route")                       // Pantalla principal
+    object Home : Screen("home_route")
+    object Logout : Screen("logout_route")
+// Pantalla principal
 
     // Rutas de Autenticación (Auth)
     object Login : Screen("login_route")
     object SignUp : Screen("signup_route")
     object ForgotPassword : Screen("forgot_password_route")
+    object NewPassword : Screen("new_password_route")
+    object PasswordChangedSuccess : Screen("password_changed_success_route")
+
+
+
+
 
     // Rutas de Perfil y Configuración
     object Profile : Screen("profile_route")
@@ -71,8 +88,9 @@ sealed class Screen(val route: String) {
 
 
     // Rutas de Features principales
+    object Analysis : Screen("analysis_route")
     object Transactions : Screen("transactions_route")
-    object Categories : Screen("categories_route")
+    object Category : Screen("category_route")
     object SavingGoals : Screen("saving_goals_route")
 
     object Help : Screen("help_route")
@@ -84,6 +102,7 @@ sealed class Screen(val route: String) {
     }
 }
 
+@SuppressLint("ComposableDestinationInComposeScope")
 @Composable
 fun FinWiseNavigation(
     isDarkTheme: Boolean,
@@ -95,6 +114,9 @@ fun FinWiseNavigation(
         navController = navController,
         startDestination = startDestination
     ) {
+
+
+
         // Pantalla Splash (inicial)
         composable(Screen.Splash.route) {
             // El SplashScreen decide el destino segun el estado de autenticacion:
@@ -155,30 +177,157 @@ fun FinWiseNavigation(
                 }
             )
         }
-
         // Rutas de Autenticacion
+
+        //Login
         composable(Screen.Login.route) {
-            PlaceholderScreen("Login Screen") // Falta la logica
+            LoginScreen(
+                onNavigateToForgotPassword = {
+                    navController.navigate(Screen.ForgotPassword.route)
+                },
+                onNavigateToSignUp = {
+                    navController.navigate(Screen.SignUp.route)
+                },
+                onLogin = {
+                    navController.navigate(Screen.Home.route) {
+                        // Primero se limpia  el stack de navegacion para que Home sea la nueva raiz
+                        popUpTo(navController.graph.findStartDestination().id) {
+                            inclusive = true
+                        }
+                        // Aseguramos que solo haya una instancia de Home
+                        launchSingleTop = true
+                    }
+                }
+            )
         }
 
+        //   pantalla de registro
         composable(Screen.SignUp.route) {
-            PlaceholderScreen("Sign Up Screen") // Falta la logica
+            SignUpScreen(
+                onNavigateToLogin = {
+                    navController.navigate(Screen.Login.route)
+                },
+                onSignUp = {
+                    navController.navigate(Screen.Home.route) {
+                        // Primero se limpia  el stack de navegacion para que Home sea la nueva raiz
+                        popUpTo(navController.graph.findStartDestination().id) {
+                            inclusive = true
+                        }
+                        // Aseguramos que solo haya una instancia de Home
+                        launchSingleTop = true
+                    }
+                }
+            )
         }
 
+// Pantalla Forgot Password
         composable(Screen.ForgotPassword.route) {
-            PlaceholderScreen("Forgot Password Screen") // Falta la logica
+            ForgotPasswordScreen(
+                onNavigateToLogin = {
+                    navController.navigate(Screen.Login.route)
+                },
+                onResetPassword = {
+                    // 👇 Cuando el usuario toca "Next step", lo mandamos al PIN screen
+                    navController.navigate(Screen.Security.route)
+                },
+                onNavigateToSignUp = {
+                    navController.navigate(Screen.SignUp.route)
+                }
+            )
         }
+        // Pantalla Security PIN
+        composable(Screen.Security.route) {
+            SecurityPinScreen(
+                onAccept = {
+                    navController.navigate(Screen.NewPassword.route)
+                },
+                onResend = {
+                    // Podrías mostrar un snackbar o repetir la acción de enviar PIN
+                },
+                onNavigateToSignUp = {
+                    navController.navigate(Screen.SignUp.route)
+                }
+            )
+        }
+// Pantalla New Password
+        composable(Screen.NewPassword.route) {
+            NewPasswordScreen(
+                onChangePassword = {
+                    navController.navigate(Screen.PasswordChangedSuccess.route)
+                },
+                onNavigateToLogin = {
+                    navController.navigate(Screen.Login.route)
+                }
+            )
+        }
+
+// Pantalla de confirmación de cambio de contraseña
+        composable(Screen.PasswordChangedSuccess.route) {
+            PasswordChangedSuccessScreen(
+                onNavigateToLogin = {
+                    navController.navigate(Screen.Login.route) {
+                        popUpTo(Screen.PasswordChangedSuccess.route) { inclusive = true }
+                    }
+                }
+            )
+        }
+
+        composable(Screen.PasswordChangedSuccess.route) {
+            PasswordChangedSuccessScreen(
+                onNavigateToLogin = {
+                    navController.navigate(Screen.Login.route) {
+                        popUpTo(Screen.PasswordChangedSuccess.route) { inclusive = true }
+                    }
+                }
+            )
+        }
+
+
 
         // Pantallas principales (ejemplo)
         composable(Screen.Home.route) {
-            // NOTA: Esta pantalla también necesitará 'darkTheme' y los callbacks
-            // del navbar cuando la implementes.
-            PlaceholderScreen("Home Screen") // Falta la logica
-        }
+            HomeScreen(
+                navController = navController,
+                darkTheme = isDarkTheme,
+                currentRoute = Screen.Home.route,
 
-        // Aca van mas pantallas (ejemplo)
-        composable(Screen.SavingGoals.route) {
-            PlaceholderScreen("Saving Goals Screen") // Falta la logica
+                // Callbacks del BottomNavBar
+                onNavigateToHome = {
+                    navController.navigate(Screen.Home.route) {
+                        popUpTo(
+                            navController.graph.startDestinationRoute!!
+                        ) { saveState = true }
+                    }
+                },
+                onNavigateToAnalysis = {
+                    navController.navigate(Screen.Analysis.route) {
+                        popUpTo(navController.graph.findStartDestination().id) { saveState = true }
+                        launchSingleTop = true
+                        restoreState = true
+                    }
+                },
+                onNavigateToTransactions = {
+                    navController.navigate(Screen.Transactions.route) {
+                        popUpTo(navController.graph.findStartDestination().id) { saveState = true }
+                        launchSingleTop = true
+                        restoreState = true
+                    }
+                },
+                onNavigateToCategory = {
+                    navController.navigate(Screen.Category.route) {
+                        popUpTo(navController.graph.findStartDestination().id) { saveState = true }
+                        launchSingleTop = true
+                        restoreState = true
+                    }
+                },
+                onNavigateToProfile = {
+                    navController.navigate(Screen.Profile.route) {
+                        popUpTo(navController.graph.findStartDestination().id) { saveState = true }
+                        launchSingleTop = true
+                        restoreState = true
+                    }
+                }
+            )
         }
 
         composable(Screen.Profile.route) {
@@ -194,10 +343,34 @@ fun FinWiseNavigation(
 
                 // Callbacks del BottomNavBar
                 // (Usamos popUpTo para evitar apilar pantallas)
-                onNavigateToHome = { navController.navigate(Screen.Home.route) { popUpTo(navController.graph.startDestinationRoute!!) { saveState = true } } },
-                onNavigateToAnalysis = { /* Falta implementar */ },
-                onNavigateToTransactions = { /* Falta implementar */ },
-                onNavigateToCategory = { /* Falta implementar */ },
+                onNavigateToHome = {
+                    navController.navigate(Screen.Home.route) {
+                        popUpTo(navController.graph.findStartDestination().id) { saveState = true }
+                        launchSingleTop = true
+                        restoreState = true
+                    }
+                },
+                onNavigateToAnalysis = {
+                    navController.navigate(Screen.Analysis.route) {
+                        popUpTo(navController.graph.findStartDestination().id) { saveState = true }
+                        launchSingleTop = true
+                        restoreState = true
+                    }
+                },
+                onNavigateToTransactions = {
+                    navController.navigate(Screen.Transactions.route) {
+                        popUpTo(navController.graph.findStartDestination().id) { saveState = true }
+                        launchSingleTop = true
+                        restoreState = true
+                    }
+                },
+                onNavigateToCategory = {
+                    navController.navigate(Screen.Category.route) {
+                        popUpTo(navController.graph.findStartDestination().id) { saveState = true }
+                        launchSingleTop = true
+                        restoreState = true
+                    }
+                },
                 onNavigateToProfile = { /* Ya estás aquí */ }
             )
         }
@@ -210,11 +383,35 @@ fun FinWiseNavigation(
                 onNavigateBack = { navController.popBackStack() },
 
                 // Callbacks del BottomNavBar
-                onNavigateToHome = { navController.navigate(Screen.Home.route) { popUpTo(navController.graph.startDestinationRoute!!) { saveState = true } } },
-                onNavigateToAnalysis = { /* Falta implementar */ },
-                onNavigateToTransactions = { /* Falta implementar */ },
-                onNavigateToCategory = { /* Falta implementar */ },
-                onNavigateToProfile = { navController.popBackStack() } // Simplemente volvemos
+                onNavigateToHome = {
+                    navController.navigate(Screen.Home.route) {
+                        popUpTo(navController.graph.findStartDestination().id) { saveState = true }
+                        launchSingleTop = true
+                        restoreState = true
+                    }
+                },
+                onNavigateToAnalysis = {
+                    navController.navigate(Screen.Analysis.route) {
+                        popUpTo(navController.graph.findStartDestination().id) { saveState = true }
+                        launchSingleTop = true
+                        restoreState = true
+                    }
+                },
+                onNavigateToTransactions = {
+                    navController.navigate(Screen.Transactions.route) {
+                        popUpTo(navController.graph.findStartDestination().id) { saveState = true }
+                        launchSingleTop = true
+                        restoreState = true
+                    }
+                },
+                onNavigateToCategory = {
+                    navController.navigate(Screen.Category.route) {
+                        popUpTo(navController.graph.findStartDestination().id) { saveState = true }
+                        launchSingleTop = true
+                        restoreState = true
+                    }
+                },
+                onNavigateToProfile = { navController.popBackStack() }
             )
         }
 
@@ -525,9 +722,26 @@ fun FinWiseNavigation(
                 onNavigateToProfile = { navController.navigate(Screen.Profile.route) }
             )
         }
+            // Aca van mas pantallas (ejemplo)
+            composable(Screen.SavingGoals.route) {
+                PlaceholderScreen("Saving Goals Screen") // Falta la logica
+            }
+
+            composable(Screen.Analysis.route) {
+                PlaceholderScreen("Analysis Screen") // Falta la logica
+            }
+
+            composable(Screen.Transactions.route) {
+                PlaceholderScreen("Transactions Screen") // Falta la logica
+            }
+
+            composable(Screen.Category.route) {
+                PlaceholderScreen("Category Screen") // Falta la logica
+            }
 
     }
 }
+
 
 // Pantalla temporal de placeholder
 @Composable
