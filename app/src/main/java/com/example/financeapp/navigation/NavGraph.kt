@@ -1,5 +1,6 @@
 package com.example.financeapp.navigation
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Text
@@ -23,8 +24,6 @@ import com.example.financeapp.ui.screens.auth.NewPasswordScreen
 import com.example.financeapp.ui.screens.auth.PasswordChangedSuccessScreen
 import com.example.financeapp.ui.screens.auth.SecurityPinScreen
 import com.example.financeapp.ui.screens.home.HomeScreen
-
-
 import com.example.financeapp.ui.screens.profile.ProfileScreen
 import com.example.financeapp.ui.screens.profile.edit_profile.EditProfileScreen
 
@@ -56,13 +55,14 @@ sealed class Screen(val route: String) {
     object EditProfile : Screen("edit_profile_route")
     object Settings : Screen("settings_route")
     object Security : Screen("security_route")
-
-    // Rutas de Features principales
+    object Analysis : Screen("analysis_route")
     object Transactions : Screen("transactions_route")
-    object Categories : Screen("categories_route")
+    object Category : Screen("category_route")
     object SavingGoals : Screen("saving_goals_route")
+
 }
 
+@SuppressLint("ComposableDestinationInComposeScope")
 @Composable
 fun FinWiseNavigation(
     isDarkTheme: Boolean,
@@ -246,12 +246,48 @@ fun FinWiseNavigation(
 
         // Pantallas principales (ejemplo)
         composable(Screen.Home.route) {
-            HomeScreen(navController = navController)
-        }
+            HomeScreen(
+                navController = navController,
+                darkTheme = isDarkTheme,
+                currentRoute = Screen.Home.route,
 
-        // Aca van mas pantallas (ejemplo)
-        composable(Screen.SavingGoals.route) {
-            PlaceholderScreen("Saving Goals Screen") // Falta la logica
+                // Callbacks del BottomNavBar
+                onNavigateToHome = {
+                    navController.navigate(Screen.Home.route) {
+                        popUpTo(
+                            navController.graph.startDestinationRoute!!
+                        ) { saveState = true }
+                    }
+                },
+                onNavigateToAnalysis = {
+                    navController.navigate(Screen.Analysis.route) {
+                        popUpTo(navController.graph.findStartDestination().id) { saveState = true }
+                        launchSingleTop = true
+                        restoreState = true
+                    }
+                },
+                onNavigateToTransactions = {
+                    navController.navigate(Screen.Transactions.route) {
+                        popUpTo(navController.graph.findStartDestination().id) { saveState = true }
+                        launchSingleTop = true
+                        restoreState = true
+                    }
+                },
+                onNavigateToCategory = {
+                    navController.navigate(Screen.Category.route) {
+                        popUpTo(navController.graph.findStartDestination().id) { saveState = true }
+                        launchSingleTop = true
+                        restoreState = true
+                    }
+                },
+                onNavigateToProfile = {
+                    navController.navigate(Screen.Profile.route) {
+                        popUpTo(navController.graph.findStartDestination().id) { saveState = true }
+                        launchSingleTop = true
+                        restoreState = true
+                    }
+                }
+            )
         }
 
         composable(Screen.Profile.route) {
@@ -267,10 +303,34 @@ fun FinWiseNavigation(
 
                 // Callbacks del BottomNavBar
                 // (Usamos popUpTo para evitar apilar pantallas)
-                onNavigateToHome = { navController.navigate(Screen.Home.route) { popUpTo(navController.graph.startDestinationRoute!!) { saveState = true } } },
-                onNavigateToAnalysis = { /* Falta implementar */ },
-                onNavigateToTransactions = { /* Falta implementar */ },
-                onNavigateToCategory = { /* Falta implementar */ },
+                onNavigateToHome = {
+                    navController.navigate(Screen.Home.route) {
+                        popUpTo(navController.graph.findStartDestination().id) { saveState = true }
+                        launchSingleTop = true
+                        restoreState = true
+                    }
+                },
+                onNavigateToAnalysis = {
+                    navController.navigate(Screen.Analysis.route) {
+                        popUpTo(navController.graph.findStartDestination().id) { saveState = true }
+                        launchSingleTop = true
+                        restoreState = true
+                    }
+                },
+                onNavigateToTransactions = {
+                    navController.navigate(Screen.Transactions.route) {
+                        popUpTo(navController.graph.findStartDestination().id) { saveState = true }
+                        launchSingleTop = true
+                        restoreState = true
+                    }
+                },
+                onNavigateToCategory = {
+                    navController.navigate(Screen.Category.route) {
+                        popUpTo(navController.graph.findStartDestination().id) { saveState = true }
+                        launchSingleTop = true
+                        restoreState = true
+                    }
+                },
                 onNavigateToProfile = { /* Ya estás aquí */ }
             )
         }
@@ -286,13 +346,55 @@ fun FinWiseNavigation(
                 },
 
                 // Callbacks del BottomNavBar
-                onNavigateToHome = { navController.navigate(Screen.Home.route) { popUpTo(navController.graph.startDestinationRoute!!) { saveState = true } } },
-                onNavigateToAnalysis = { /* Falta implementar */ },
-                onNavigateToTransactions = { /* Falta implementar */ },
-                onNavigateToCategory = { /* Falta implementar */ },
-                onNavigateToProfile = { navController.popBackStack() } // Simplemente volvemos
+                onNavigateToHome = {
+                    navController.navigate(Screen.Home.route) {
+                        popUpTo(navController.graph.findStartDestination().id) { saveState = true }
+                        launchSingleTop = true
+                        restoreState = true
+                    }
+                },
+                onNavigateToAnalysis = {
+                    navController.navigate(Screen.Analysis.route) {
+                        popUpTo(navController.graph.findStartDestination().id) { saveState = true }
+                        launchSingleTop = true
+                        restoreState = true
+                    }
+                },
+                onNavigateToTransactions = {
+                    navController.navigate(Screen.Transactions.route) {
+                        popUpTo(navController.graph.findStartDestination().id) { saveState = true }
+                        launchSingleTop = true
+                        restoreState = true
+                    }
+                },
+                onNavigateToCategory = {
+                    navController.navigate(Screen.Category.route) {
+                        popUpTo(navController.graph.findStartDestination().id) { saveState = true }
+                        launchSingleTop = true
+                        restoreState = true
+                    }
+                },
+                onNavigateToProfile = { navController.popBackStack() }
             )
         }
+
+            // Aca van mas pantallas (ejemplo)
+            composable(Screen.SavingGoals.route) {
+                PlaceholderScreen("Saving Goals Screen") // Falta la logica
+            }
+
+            composable(Screen.Analysis.route) {
+                PlaceholderScreen("Analysis Screen") // Falta la logica
+            }
+
+            composable(Screen.Transactions.route) {
+                PlaceholderScreen("Transactions Screen") // Falta la logica
+            }
+
+            composable(Screen.Category.route) {
+                PlaceholderScreen("Category Screen") // Falta la logica
+            }
+
     }
 }
 
