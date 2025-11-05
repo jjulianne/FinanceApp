@@ -3,6 +3,9 @@ package com.example.financeapp.core
 
 import androidx.compose.ui.graphics.Color
 import com.example.financeApp.R
+import com.example.financeapp.ui.theme.LightBlue
+import com.example.financeapp.ui.theme.Void
+
 // You MUST update the 'R' import to your project's R class!
 // e.g., import com.example.financeapp.R
 
@@ -39,20 +42,19 @@ data class ScreenContent(
 
 
 val IncomeTransactions = listOf(
-    TransactionItemData(R.drawable.salary_green, "Salary", "18:27 - April 30", "Monthly", "$4,000,00", GreenPrimary),
-    TransactionItemData(R.drawable.gift, "Others", "17:00 - April 24", "Payments", "$120,00", GreenPrimary),
-    TransactionItemData(R.drawable.salary_green, "Salary", "18:39 - March 31", "Monthly", "$4,000,00", GreenPrimary),
-    TransactionItemData(R.drawable.gift, "Others", "9:30 - March 12", "Upwork", "$340,00", GreenPrimary),
-    TransactionItemData(R.drawable.gift, "Others", "19:30 - February 20", "Upwork", "$340,00", GreenPrimary),
+    TransactionItemData(R.drawable.salary_white, "Salary", "18:27 - April 30", "Monthly", "$4,000,00",Void),
+    TransactionItemData(R.drawable.salary_white, "Payments", "17:00 - April 24", "Payments", "$120,00", Void),
+    TransactionItemData(R.drawable.salary_white, "Salary", "18:39 - March 31", "Monthly", "$4,000,00", Void),
+    TransactionItemData(R.drawable.salary_white, "Others", "9:30 - March 12", "Upwork", "$340,00", Void),
+    TransactionItemData(R.drawable.salary_white, "Others", "19:30 - February 20", "Upwork", "$340,00", Void),
 )
 
 val ExpenseTransactions = listOf(
-    TransactionItemData(R.drawable.groceries, "Groceries", "17:00 - April 24", "Pantry", "-$100,00", BlueExpense),
-    TransactionItemData(R.drawable.rent, "Rent", "8:30 - April 15", "Rent", "-$674,40", BlueExpense),
-    TransactionItemData(R.drawable.transport, "Transport", "7:30 - April 08", "Fuel", "-$4,13", BlueExpense),
-    TransactionItemData(R.drawable.food_green, "Food", "19:30 - March 31", "Dinner", "-$70,40", BlueExpense),
-    TransactionItemData(R.drawable.rent, "Rent", "18:39 - March 31", "Rent", "-$674,40", BlueExpense),
-    TransactionItemData(R.drawable.gift, "Others", "19:30 - February 28", "Food", "-$40,00", BlueExpense),
+    TransactionItemData(R.drawable.groceries, "Groceries", "17:00 - April 24", "Pantry", "-$100,00", LightBlue),
+    TransactionItemData(R.drawable.rent, "Rent", "8:30 - April 15", "Rent", "-$674,40", LightBlue),
+    TransactionItemData(R.drawable.transport, "Transport", "7:30 - April 08", "Fuel", "-$4,13", LightBlue),
+    TransactionItemData(R.drawable.food_green, "Food", "19:30 - March 31", "Dinner", "-$70,40", LightBlue),
+    TransactionItemData(R.drawable.rent, "Rent", "18:39 - March 31", "Rent", "-$674,40", LightBlue),
 )
 
 // Combine and sort for the main Transactions view

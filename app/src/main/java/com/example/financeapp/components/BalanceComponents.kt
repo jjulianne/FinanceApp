@@ -21,11 +21,20 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.material.icons.Icons
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.material.icons.filled.Notifications
 
 import com.example.financeApp.R
-import com.example.financeapp.core.GreyText // Asumido
 import com.example.financeapp.ui.theme.* // Importamos los colores de FinWise
+
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsPressedAsState
+
+
+
+import androidx.compose.runtime.*
+
 
 // --- Colores de la barra de progreso (Usando Void) ---
 val ProgressTrackColor = FinWiseWhite // Fondo blanco
@@ -67,23 +76,22 @@ fun BalanceHeaderItem(
             Icon(
                 painter = painterResource(id = iconResId),
                 contentDescription = title,
-                tint = FinWiseGreen,
                 modifier = Modifier.size(16.dp)
             )
             Spacer(modifier = Modifier.width(4.dp))
 
             Text(
                 text = title,
-                color = FinWiseWhite.copy(0.7f),
+                color = Void,
                 fontSize = 14.sp
             )
         }
 
         Text(
             text = amount,
-            color = if (isExpense) LightBlue else FinWiseWhite,
+            color = if (isExpense) OceanBlue else Honeydew,
             fontWeight = FontWeight.Bold,
-            fontSize = 18.sp
+            fontSize = 24.sp
         )
     }
 }
@@ -102,8 +110,8 @@ fun ExpenseProgressIndicator(
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 8.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
+            .padding(horizontal = 38.dp),
+
     ) {
         // Contenedor de la barra de progreso
         Box(
@@ -154,18 +162,21 @@ fun ExpenseProgressIndicator(
         Spacer(modifier = Modifier.height(12.dp))
 
         // Texto de estado
-        Row(verticalAlignment = Alignment.CenterVertically) {
+        Row( modifier = Modifier
+            .padding(horizontal = 10.dp),
+            horizontalArrangement = Arrangement.Start,
+            verticalAlignment = Alignment.CenterVertically) {
             Icon(
                 painter = painterResource(id = iconResId),
                 contentDescription = "Good",
-                tint = FinWiseWhite,
+                tint = Void,
                 modifier = Modifier.size(16.dp)
             )
             Spacer(Modifier.width(8.dp))
             Text(
                 text = "$percentage Of Your Expenses, Looks Good.",
-                color = FinWiseWhite,
-                fontSize = 14.sp
+                color = Void,
+                fontSize = 15.sp
             )
         }
     }
@@ -175,7 +186,7 @@ fun ExpenseProgressIndicator(
 @Composable
 fun MonthHeader(month: String) {
     Row(
-        modifier = Modifier.fillMaxWidth().padding(top = 16.dp, bottom = 12.dp),
+        modifier = Modifier.fillMaxWidth().padding(top = 25.dp, bottom = 12.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Start
     ) {
@@ -192,28 +203,48 @@ fun TransactionItem(
     dateAndTime: String,
     category: String,
     amount: String,
-    amountColor: Color // Usado para ingresos
+    amountColor: Color, // Usado para ingresos
+    onClick: () -> Unit // <-- ¡El nuevo parámetro obligatorio!
 ) {
+    // 1. Manejo de la interacción para el efecto de click
+    val interactionSource = remember { MutableInteractionSource() }
+    val isPressed by interactionSource.collectIsPressedAsState()
+
+    // 2. Determinación dinámica del color de fondo del ícono
+    val iconBackgroundColor = if (isPressed) {
+        OceanBlue // Si está presionado, usa OceanBlue
+    } else {
+        VividBlue // Color normal
+    }
+
+    // Asumimos que Honeydew es el color correcto para el ícono
+    val iconTint = Honeydew
+    val finalAmountColor = if (amount.contains("-")) LightBlue else amountColor
+
     Card(
         shape = RoundedCornerShape(16.dp),
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(
+                interactionSource = interactionSource,
+                indication = null, // Desactivamos el ripple predeterminado del Card
+                onClick = onClick
+            ),
         colors = CardDefaults.cardColors(containerColor = FinWiseWhite),
         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(vertical = 12.dp, horizontal = 0.dp),
+                .padding(vertical = 4.dp, horizontal = 0.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // Icon Column (Usamos LightBlue)
-            val iconTint = LightBlue
-
+            // Icon Column
             Box(
                 modifier = Modifier
                     .size(54.dp)
                     .clip(RoundedCornerShape(16.dp))
-                    .background(iconTint.copy(alpha = 0.1f))
+                    .background(iconBackgroundColor) // <-- Aplica el color dinámico aquí
                     .padding(8.dp),
                 contentAlignment = Alignment.Center
             ) {
@@ -226,27 +257,30 @@ fun TransactionItem(
             }
             Spacer(Modifier.width(16.dp))
 
+
             // Details Column (Title and Date)
             Column(modifier = Modifier.width(100.dp)) {
-                Text(title, fontWeight = FontWeight.SemiBold, fontSize = 16.sp, color = Void) // Título oscuro (Void)
+                Text(title, fontWeight = FontWeight.SemiBold, fontSize = 16.sp, color = Void)
                 Text(dateAndTime, fontSize = 12.sp, color = FinWiseDarkGreen)
             }
-
+            // Separador Verde Fino 1
+            Divider(
+                color = FinWiseGreen.copy(alpha = 0.5f),
+                modifier = Modifier.height(30.dp).width(1.dp)
+            )
+            Spacer(Modifier.width(12.dp))
+            // Texto de categoría
             // Separator 1 & Category Column
             Row(
                 modifier = Modifier.weight(1f).padding(horizontal = 12.dp),
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Start
-            ) {
-                // Separador Verde Fino 1
-                Divider(
-                    color = FinWiseGreen.copy(alpha = 0.5f), // FinWiseGreen semitransparente
-                    modifier = Modifier.height(30.dp).width(1.dp)
-                )
-                Spacer(Modifier.width(12.dp))
-                // Texto de categoría
+                horizontalArrangement = Arrangement.SpaceEvenly) {
+
                 Text(category, fontSize = 14.sp, color = FinWiseDarkGreen)
                 Spacer(Modifier.width(12.dp))
+                // Separador Verde Fino 2
+
+
             }
 
             // Separator 2 & Amount Column
@@ -254,23 +288,20 @@ fun TransactionItem(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.End
             ) {
-                // Separador Verde Fino 2
                 Divider(
-                    color = FinWiseGreen.copy(alpha = 0.5f), // FinWiseGreen semitransparente
+                    color = FinWiseGreen.copy(alpha = 0.5f),
                     modifier = Modifier.height(30.dp).width(1.dp)
                 )
                 Spacer(Modifier.width(12.dp))
 
-                // Monto (LightBlue para egreso, amountColor para ingreso)
-                val finalAmountColor = if (amount.contains("-")) LightBlue else amountColor
-
+                // Monto
                 Text(
                     amount,
                     color = finalAmountColor,
                     fontWeight = FontWeight.Bold,
-                    fontSize = 16.sp,
+                    fontSize = 14.sp,
                     modifier = Modifier.width(80.dp),
-                    textAlign = TextAlign.End
+                    textAlign = TextAlign.Center
                 )
             }
         }

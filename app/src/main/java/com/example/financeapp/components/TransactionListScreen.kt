@@ -1,5 +1,3 @@
-package com.example.financeapp.components
-
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -17,13 +15,21 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.financeapp.core.* // Import data/constants
 import com.example.financeApp.R
+import com.example.financeapp.components.BottomNavBar
+import com.example.financeapp.components.ExpenseProgressIndicator
+import com.example.financeapp.components.MonthHeader
+import com.example.financeapp.components.NotificationIcon
+import com.example.financeapp.components.TransactionItem
 import com.example.financeapp.ui.theme.* // Importamos los colores de FinWise
+import java.time.LocalDateTime
 import java.time.Month
+import java.time.format.DateTimeFormatter
 import java.time.format.TextStyle
 import java.util.Locale
 
@@ -56,45 +62,67 @@ fun TransactionListScreen(
             )
 
             // 2. White Content Area (Transaction List)
+            // ESTE BLOQUE AHORA USA EL DISEÑO Y LA LÓGICA DE ORDENAMIENTO DE ACCOUNTBALANCESCREEN,
+            // PERO FILTRA LOS DATOS USANDO content.transactions.
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .clip(RoundedCornerShape(topStart = 32.dp, topEnd = 32.dp))
-                    .background(FinWiseWhite) // Usamos FinWiseWhite
-                    .padding(horizontal = 24.dp) // Aumentamos el padding lateral para el contenido
-                    .offset(y = (-30).dp) // Offset para solapar el header
+                    .clip(RoundedCornerShape(topStart = 50.dp, topEnd = 50.dp)) // <-- Cambio de 32dp a 50dp
+                    .background(FinWiseWhite)
+                    .padding(horizontal = 24.dp)
+                    .offset(y = (-20).dp) // <-- Cambio de -30dp a -20dp
             ) {
 
                 // Group transactions by month and then sort months
-                val groupedTransactions = content.transactions
+                val groupedTransactions = content.transactions // <-- FUENTE DE DATOS: content.transactions (Filtra)
                     .groupBy { transaction ->
-                        // Extraer el nombre del mes y obtener el objeto Month para ordenar
+                        // Extract the month name and get the Month object for ordering
                         val monthString = transaction.dateAndTime.substringAfter("- ").substringBefore(" ")
-                        // Asumimos que los nombres de los meses en la data están en inglés (e.g., "April")
-                        Month.valueOf(monthString.uppercase(Locale.getDefault()))
+                        Month.valueOf(monthString.uppercase(Locale.ENGLISH))
                     }
-                    .toSortedMap(compareByDescending { it }) // Ordenar los meses de forma descendente (ej: April, March)
+                    .toSortedMap(Comparator.reverseOrder()) // Order months descending (e.g., April, March)
 
-                // Transactions List
                 LazyColumn(
-                    modifier = Modifier.fillMaxSize(),
+                    // Padding interior del LazyColumn. start = 10.dp lo acerca al borde izquierdo.
+                    modifier = Modifier.fillMaxSize().padding(top = 16.dp, start = 10.dp),
                     verticalArrangement = Arrangement.spacedBy(10.dp)
                 ) {
                     groupedTransactions.forEach { (monthEnum, transactions) ->
-                        // Convertir Month enum a String capitalizado para el UI
-                        val monthName = monthEnum.getDisplayName(TextStyle.FULL, Locale.getDefault())
-                            .replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString() }
+
+                        // 1. Order transactions by date and time (within the month)
+                        val sortedTransactions = transactions.sortedByDescending { item ->
+                            try {
+                                // 1. Construir la cadena de fecha con el año ficticio para el parseo
+                                val dateString = item.dateAndTime
+                                // Cadena: "HH:mm MMMM d 2025"
+                                val datePartWithYear = dateString.substringBefore(" -") + " " + dateString.substringAfter("- ") + " 2025"
+
+                                // 2. Usamos el formato que coincide con la cadena construida
+                                val formatter = DateTimeFormatter.ofPattern("HH:mm MMMM d yyyy", Locale.ENGLISH)
+
+                                // 3. Intentamos parsear y retornamos el objeto comparable
+                                LocalDateTime.parse(datePartWithYear, formatter)
+                            } catch (e: Exception) {
+                                // 4. Si el parseo falla (formato incorrecto), retorna la fecha mínima para que vaya al final
+                                LocalDateTime.MIN
+                            }
+                        }
+
+                        // Convertir Month enum to capitalized String for the UI
+                        val monthName = monthEnum.getDisplayName(TextStyle.FULL, Locale.ENGLISH)
+                            .replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.ENGLISH) else it.toString() }
 
                         item { MonthHeader(monthName) }
 
-                        items(transactions) { item ->
+                        items(sortedTransactions) { item ->
                             TransactionItem(
                                 iconResId = item.iconResId,
                                 title = item.title,
                                 dateAndTime = item.dateAndTime,
                                 category = item.category,
                                 amount = item.amount,
-                                amountColor = item.amountColor
+                                amountColor = item.amountColor,
+                                onClick = {}
                             )
                         }
                     }
@@ -104,8 +132,9 @@ fun TransactionListScreen(
     }
 }
 
+
 // =========================================================================
-// HELPER COMPONENTS (Ahora incluye la estructura de tarjetas de Figma)
+// HELPER COMPONENTS (NO MODIFICADO)
 // =========================================================================
 
 @Composable
@@ -170,7 +199,7 @@ fun CustomHeader(
             SummaryBlockCard(
                 title = "Income",
                 amount = content.incomeAmount,
-                iconResId = R.drawable.income_green, // Icono Income
+                iconResId = R.drawable.income_light_green, // Icono Income
                 activeColor = OceanBlue, // <--- Color visual ACTIVO es OceanBlue
                 active = content.activeCardColor == FinWiseGreen, // <--- Lógica: Activo si la bandera es FinWiseGreen
                 passiveColor = Honeydew,
@@ -190,15 +219,7 @@ fun CustomHeader(
         }
 
         // --- Barra de Progreso (Solo en TransactionsScreen/BalanceScreen) ---
-        if (showProgressBar) {
-            Spacer(Modifier.height(16.dp))
-            ExpenseProgressIndicator(
-                progress = 0.3f,
-                totalLimit = "$20,000.00",
-                percentage = "30%"
-            )
-            Spacer(Modifier.height(16.dp))
-        }
+
     }
 }
 
@@ -208,8 +229,6 @@ fun SummaryBlockCard(
     title: String, amount: String, iconResId: Int, active: Boolean,
     activeColor: Color, passiveColor: Color, modifier: Modifier = Modifier
 ) {
-    // La lógica de isTransactionScreen ya no es necesaria si el color pasivo siempre es Honeydew.
-
     val backgroundColor = when {
         // Caso ACTIVO: Usamos el color OceanBlue
         active -> activeColor
@@ -218,11 +237,11 @@ fun SummaryBlockCard(
     }
 
     // Colores de texto e ícono
-    // Si está ACTIVO (OceanBlue): Texto/Icono Blanco.
-    // Si está PASIVO (Honeydew): Texto/Icono del color activo (OceanBlue)
-    val iconTint = if (active) FinWiseWhite else activeColor
     val textColor = if (active) FinWiseWhite else Void
     val amountColor = if (active) FinWiseWhite else activeColor
+
+    // Si activo, el ícono es blanco. Si inactivo, usa el color original del drawable (Color.Unspecified).
+    val iconTint = if (active) FinWiseWhite else Color.Unspecified
 
     Card(
         shape = RoundedCornerShape(20.dp),
@@ -232,20 +251,20 @@ fun SummaryBlockCard(
     ) {
         Column(
             modifier = Modifier.fillMaxSize().padding(16.dp), // Aumentamos padding a 16.dp
-            horizontalAlignment = Alignment.Start,
+            horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.SpaceBetween
         ) {
             // Icon
             Icon(
                 painter = painterResource(id = iconResId),
                 contentDescription = title,
-                tint = iconTint,
-                modifier = Modifier.size(24.dp)
+                tint = iconTint, // <-- Usa el tint dinámico
+                modifier = Modifier.size(25.dp)
             )
 
             // Text Details
-            Column(horizontalAlignment = Alignment.Start) {
-                Text(title, fontSize = 14.sp, color = textColor.copy(alpha = 0.8f))
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Text(title, fontSize = 16.sp, color = textColor.copy(alpha = 0.8f))
                 Text(
                     amount,
                     fontWeight = FontWeight.Bold,
