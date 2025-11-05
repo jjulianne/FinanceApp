@@ -65,7 +65,7 @@ fun CategoriesScreen(
     onNavigateToAnalysis: () -> Unit = {},
     onNavigateToTransactions: () -> Unit = {},
     onNavigateToCategory: () -> Unit = {},
-    onNavigateToProfile: () -> Unit = {}
+    onNavigateToProfile: () -> Unit = {},
 ) {
     Scaffold(
         topBar = {

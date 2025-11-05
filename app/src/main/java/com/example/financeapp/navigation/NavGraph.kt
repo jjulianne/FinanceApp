@@ -1180,11 +1180,82 @@ fun FinWiseNavigation(
         }
 
         composable(Screen.Categories.route) {
-            CategoriesScreen(navController = navController, darkTheme = false)
+            CategoriesScreen(
+                navController = navController,
+                darkTheme = false,
+                    // Callbacks del BottomNavBar
+                    onNavigateToHome = {
+                navController.navigate(Screen.Home.route) {
+                    popUpTo(navController.graph.findStartDestination().id) { saveState = true }
+                    launchSingleTop = true
+                    restoreState = true
+                }
+            },
+                onNavigateToAnalysis = {
+                    navController.navigate(Screen.Analysis.route) {
+                        popUpTo(navController.graph.findStartDestination().id) { saveState = true }
+                        launchSingleTop = true
+                        restoreState = true
+                    }
+                },
+                onNavigateToTransactions = {
+                    navController.navigate(Screen.Transactions.route) {
+                        popUpTo(navController.graph.findStartDestination().id) { saveState = true }
+                        launchSingleTop = true
+                        restoreState = true
+                    }
+                },
+                onNavigateToCategory = {
+                    navController.popBackStack()
+
+                },
+                onNavigateToProfile = {
+                    navController.navigate(Screen.Profile.route) {
+                        popUpTo(navController.graph.findStartDestination().id) { saveState = true }
+                        launchSingleTop = true
+                        restoreState = true
+                    }
+                }
+            )
         }
         composable(Screen.Food.route) {
             FoodScreen(
-                navController = navController, darkTheme = false)
+                navController = navController,
+                darkTheme = false,
+                // Callbacks del BottomNavBar
+                onNavigateToHome = {
+                    navController.navigate(Screen.Home.route) {
+                        popUpTo(navController.graph.findStartDestination().id) { saveState = true }
+                        launchSingleTop = true
+                        restoreState = true
+                    }
+                },
+                onNavigateToAnalysis = {
+                    navController.navigate(Screen.Analysis.route) {
+                        popUpTo(navController.graph.findStartDestination().id) { saveState = true }
+                        launchSingleTop = true
+                        restoreState = true
+                    }
+                },
+                onNavigateToTransactions = {
+                    navController.navigate(Screen.Transactions.route) {
+                        popUpTo(navController.graph.findStartDestination().id) { saveState = true }
+                        launchSingleTop = true
+                        restoreState = true
+                    }
+                },
+                onNavigateToCategory = {
+                    navController.popBackStack()
+
+                },
+                onNavigateToProfile = {
+                    navController.navigate(Screen.Profile.route) {
+                        popUpTo(navController.graph.findStartDestination().id) { saveState = true }
+                        launchSingleTop = true
+                        restoreState = true
+                    }
+                }
+            )
         }
         composable(Screen.AddExpenses.route) {
             AddExpenseScreen(
