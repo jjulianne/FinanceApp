@@ -24,30 +24,35 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.financeApp.R
 import com.example.financeapp.components.AppHeader
 import com.example.financeapp.components.BottomNavBar
+import com.example.financeapp.components.LoadingScreen
 import com.example.financeapp.ui.theme.FinanceAppTheme
 
 @Composable
 fun DeleteAccountScreen(
+    viewModel: DeleteAccountViewModel = hiltViewModel(),
     darkTheme: Boolean,
     currentRoute: String = "profile_route",
     onNavigateBack: () -> Unit = {},
-    onDeleteAccount: (String) -> Unit = { _ -> },
-    onCancel: () -> Unit = {},
+    onAccountDeleted: () -> Unit = {}, // Se llamará para navegar al Login
     onNavigateToHome: () -> Unit = {},
     onNavigateToAnalysis: () -> Unit = {},
     onNavigateToTransactions: () -> Unit = {},
     onNavigateToCategory: () -> Unit = {},
     onNavigateToProfile: () -> Unit = {}
 ) {
-    // Estado para la contrasenia de confirmacion
-    var confirmPassword by remember { mutableStateOf("") }
-    var passwordVisible by remember { mutableStateOf(false) }
+    val state by viewModel.uiState.collectAsState()
 
-    // Estado para controlar la visibilidad del popup
-    var showDialog by remember { mutableStateOf(false) }
+    LaunchedEffect(key1 = true) {
+        viewModel.events.collect { event ->
+            when (event) {
+                is DeleteAccountEvent.OnAccountDeleted -> onAccountDeleted()
+            }
+        }
+    }
 
     Scaffold(
         bottomBar = {
@@ -61,7 +66,7 @@ fun DeleteAccountScreen(
                 onNavigateToProfile = onNavigateToProfile
             )
         }
-    ) { _ ->
+    ) { _ -> // Antes tenia un padding el cual borre porque sino me tiraba la pantalla para abajo
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -151,10 +156,10 @@ fun DeleteAccountScreen(
 
                 // Campo de contrasenia
                 DeleteAccountPasswordField(
-                    value = confirmPassword,
-                    onValueChange = { confirmPassword = it },
-                    isVisible = passwordVisible,
-                    onVisibilityToggle = { passwordVisible = !passwordVisible }
+                    value = state.confirmPassword,
+                    onValueChange = viewModel::onPasswordChanged,
+                    isVisible = state.isPasswordVisible,
+                    onVisibilityToggle = viewModel::onToggleVisibility
                 )
 
                 Spacer(modifier = Modifier.height(32.dp))
@@ -167,7 +172,8 @@ fun DeleteAccountScreen(
                 ) {
                     // Boton de eliminar cuenta
                     Button(
-                        onClick = { showDialog = true },
+                        onClick = viewModel::onDeleteClicked,
+                        enabled = !state.isLoading, // Deshabilitado si está cargando
                         modifier = Modifier
                             .width(220.dp)
                             .height(44.dp),
@@ -176,17 +182,25 @@ fun DeleteAccountScreen(
                         ),
                         shape = RoundedCornerShape(25.dp)
                     ) {
-                        Text(
-                            text = "Yes, Delete Account",
-                            fontSize = 15.sp,
-                            fontWeight = FontWeight.SemiBold,
-                            color = MaterialTheme.colorScheme.secondary
-                        )
+                        if (state.isLoading) {
+                            CircularProgressIndicator(
+                                modifier = Modifier.size(24.dp),
+                                color = MaterialTheme.colorScheme.secondary
+                            )
+                        } else {
+                            Text(
+                                text = "Yes, Delete Account",
+                                fontSize = 15.sp,
+                                fontWeight = FontWeight.SemiBold,
+                                color = MaterialTheme.colorScheme.secondary
+                            )
+                        }
                     }
 
                     // Boton de cancelar
                     Button(
-                        onClick = onCancel,
+                        onClick = onNavigateBack, // Llama al onNavigateBack
+                        enabled = !state.isLoading, // Deshabilitado si está cargando
                         modifier = Modifier
                             .width(220.dp)
                             .height(44.dp),
@@ -207,16 +221,32 @@ fun DeleteAccountScreen(
         }
     }
 
-    // Este es el popup
-    if (showDialog) {
+    // Este es el popup (CONECTADO)
+    if (state.showConfirmDialog) {
         DeleteConfirmationPopup(
-            onConfirm = {
-                showDialog = false // Cierra el popup
-                onDeleteAccount(confirmPassword) // Llama a la accion de borrado
-            },
-            onCancel = {
-                showDialog = false // Simplemente cierra el popup
-            }
+            onConfirm = viewModel::onConfirmDeletion,
+            onCancel = viewModel::onCancelDialog
+        )
+    }
+
+    // Popups de éxito y error
+    if (state.showSuccess) {
+        LoadingScreen(
+            message = "Account Deleted Successfully", // Mensaje de éxito
+            isVisible = true,
+            onDismiss = viewModel::onSuccessDialogDismissed,
+            isError = false,
+            durationMillis = 3000L
+        )
+    }
+
+    if (state.errorMessage != null) {
+        LoadingScreen(
+            message = state.errorMessage!!,
+            isVisible = true,
+            onDismiss = viewModel::onErrorDialogDismissed,
+            isError = true,
+            durationMillis = 4000L
         )
     }
 }

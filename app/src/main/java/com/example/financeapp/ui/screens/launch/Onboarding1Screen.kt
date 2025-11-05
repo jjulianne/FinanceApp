@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -26,9 +27,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.financeApp.R
-import com.example.financeapp.ui.theme.FinWiseDarkGreen
-import com.example.financeapp.ui.theme.FinWiseGreen
 import com.example.financeapp.core.noRippleClickable
+import com.example.financeapp.ui.theme.FinanceAppTheme
 
 @Composable
 fun Onboarding1Screen(
@@ -37,7 +37,7 @@ fun Onboarding1Screen(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(FinWiseGreen) // Fondo verde principal
+            .background(MaterialTheme.colorScheme.background) // Fondo verde principal
     ) {
         // Titulo
         Text(
@@ -50,7 +50,7 @@ fun Onboarding1Screen(
             fontWeight = FontWeight.SemiBold, // Poppins SemiBold 600
             lineHeight = 39.sp,
             textAlign = TextAlign.Center,
-            color = FinWiseDarkGreen, // #0E3E3E
+            color = MaterialTheme.colorScheme.onSurface, // #0E3E3E
             letterSpacing = 0.sp
         )
 
@@ -61,7 +61,7 @@ fun Onboarding1Screen(
                 .width(430.dp)
                 .height(624.dp)
                 .clip(RoundedCornerShape(topStart = 40.dp, topEnd = 40.dp))
-                .background(Color(0xFFF1FFF3)) // #F1FFF3
+                .background(MaterialTheme.colorScheme.surface) // #F1FFF3
         )
 
         // Circulo de fondo
@@ -70,7 +70,7 @@ fun Onboarding1Screen(
                 .offset(x = 99.dp, y = 443.dp)
                 .size(248.dp)
                 .clip(CircleShape)
-                .background(Color(0xFFDFF7E2)) // #DFF7E2
+                .background(MaterialTheme.colorScheme.surfaceVariant) // #DFF7E2
         )
 
         // Coin
@@ -94,7 +94,7 @@ fun Onboarding1Screen(
                 fontSize = 30.sp,
                 fontWeight = FontWeight.SemiBold, // Poppins SemiBold 600
                 textAlign = TextAlign.Center,
-                color = FinWiseDarkGreen, // #0E3E3E
+                color = MaterialTheme.colorScheme.onSurface, // #0E3E3E
                 letterSpacing = 0.sp,
                 modifier = Modifier.noRippleClickable { onNext() }
             )
@@ -113,7 +113,7 @@ fun Onboarding1Screen(
                 modifier = Modifier
                     .size(13.dp)
                     .clip(CircleShape)
-                    .background(FinWiseGreen) // #00D09E
+                    .background(MaterialTheme.colorScheme.primary) // #00D09E
             )
 
             // Dot inactivo (segunda pagina)
@@ -122,7 +122,7 @@ fun Onboarding1Screen(
                     .size(13.dp)
                     .clip(CircleShape)
                     .background(Color.Transparent)
-                    .border(2.dp, FinWiseDarkGreen, CircleShape)
+                    .border(2.dp, MaterialTheme.colorScheme.primaryContainer, CircleShape)
             )
         }
     }
@@ -131,5 +131,7 @@ fun Onboarding1Screen(
 @Preview(showBackground = true, widthDp = 430, heightDp = 932)
 @Composable
 fun Onboarding1ScreenPreview() {
-    Onboarding1Screen(onNext = {})
+    FinanceAppTheme(darkTheme = false) {
+        Onboarding1Screen(onNext = {})
+    }
 }

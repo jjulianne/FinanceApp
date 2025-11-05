@@ -18,35 +18,36 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.financeApp.R
 import com.example.financeapp.components.AppHeader
 import com.example.financeapp.components.BottomNavBar
-import com.example.financeapp.ui.theme.FinanceAppTheme
+import com.example.financeapp.components.LoadingScreen
 
 @Composable
 fun PasswordSettingsScreen(
     darkTheme: Boolean,
     currentRoute: String = "profile_route",
+    viewModel: PasswordSettingsViewModel = hiltViewModel(),
     onNavigateBack: () -> Unit = {},
-    onChangePassword: (String, String, String) -> Unit = { _, _, _ -> },
     onNavigateToHome: () -> Unit = {},
     onNavigateToAnalysis: () -> Unit = {},
     onNavigateToTransactions: () -> Unit = {},
     onNavigateToCategory: () -> Unit = {},
     onNavigateToProfile: () -> Unit = {}
 ) {
-    // Estados para los campos de contrasenia
-    var currentPassword by remember { mutableStateOf("") }
-    var newPassword by remember { mutableStateOf("") }
-    var confirmPassword by remember { mutableStateOf("") }
+    val state by viewModel.uiState.collectAsState()
 
-    // Estados para visibilidad de contrasenias
-    var currentPasswordVisible by remember { mutableStateOf(false) }
-    var newPasswordVisible by remember { mutableStateOf(false) }
-    var confirmPasswordVisible by remember { mutableStateOf(false) }
+    LaunchedEffect(key1 = Unit) {
+        viewModel.events.collect { event ->
+            when (event) {
+                is PasswordSettingsEvent.NavigateBack -> onNavigateBack()
+            }
+        }
+    }
+
 
     Scaffold(
         bottomBar = {
@@ -64,7 +65,6 @@ fun PasswordSettingsScreen(
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                // Usamos el color de fondo principal
                 .background(MaterialTheme.colorScheme.background)
         ) {
             // Header
@@ -81,7 +81,6 @@ fun PasswordSettingsScreen(
                     .offset(y = 120.dp)
                     .fillMaxHeight()
                     .clip(RoundedCornerShape(topStart = 40.dp, topEnd = 40.dp))
-                    // Usamos el color de superficie (fondo de tarjetas)
                     .background(MaterialTheme.colorScheme.surface)
             )
 
@@ -96,28 +95,28 @@ fun PasswordSettingsScreen(
                 // Current Password
                 PasswordField(
                     label = "Current Password",
-                    value = currentPassword,
-                    onValueChange = { currentPassword = it },
-                    isVisible = currentPasswordVisible,
-                    onVisibilityToggle = { currentPasswordVisible = !currentPasswordVisible }
+                    value = state.currentPassword,
+                    onValueChange = viewModel::onCurrentPasswordChanged,
+                    isVisible = state.isCurrentPasswordVisible,
+                    onVisibilityToggle = { viewModel.onToggleVisibility("current") }
                 )
 
                 // New Password
                 PasswordField(
                     label = "New Password",
-                    value = newPassword,
-                    onValueChange = { newPassword = it },
-                    isVisible = newPasswordVisible,
-                    onVisibilityToggle = { newPasswordVisible = !newPasswordVisible }
+                    value = state.newPassword,
+                    onValueChange = viewModel::onNewPasswordChanged,
+                    isVisible = state.isNewPasswordVisible,
+                    onVisibilityToggle = { viewModel.onToggleVisibility("new") }
                 )
 
                 // Confirm New Password
                 PasswordField(
                     label = "Confirm New Password",
-                    value = confirmPassword,
-                    onValueChange = { confirmPassword = it },
-                    isVisible = confirmPasswordVisible,
-                    onVisibilityToggle = { confirmPasswordVisible = !confirmPasswordVisible }
+                    value = state.confirmPassword,
+                    onValueChange = viewModel::onConfirmPasswordChanged,
+                    isVisible = state.isConfirmPasswordVisible,
+                    onVisibilityToggle = { viewModel.onToggleVisibility("confirm") }
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
@@ -128,7 +127,8 @@ fun PasswordSettingsScreen(
                     contentAlignment = Alignment.Center
                 ) {
                     Button(
-                        onClick = { onChangePassword(currentPassword, newPassword, confirmPassword) },
+                        onClick = viewModel::onChangePasswordClicked,
+                        enabled = !state.isLoading,
                         modifier = Modifier
                             .width(200.dp)
                             .height(44.dp),
@@ -145,6 +145,26 @@ fun PasswordSettingsScreen(
                         )
                     }
                 }
+            }
+
+            if (state.showSuccess) {
+                LoadingScreen(
+                    message = "Password Changed\nSuccessfully",
+                    isVisible = true,
+                    onDismiss = viewModel::onSuccessDialogDismissed,
+                    isError = false,
+                    durationMillis = 3000L
+                )
+            }
+
+            if (state.errorMessage != null) {
+                LoadingScreen(
+                    message = state.errorMessage!!,
+                    isVisible = true,
+                    onDismiss = viewModel::onErrorDialogDismissed,
+                    isError = true,
+                    durationMillis = 4000L
+                )
             }
         }
     }
@@ -166,7 +186,6 @@ private fun PasswordField(
             text = label,
             fontSize = 16.sp,
             fontWeight = FontWeight.Medium,
-            // Texto sobre la superficie (tarjeta)
             color = MaterialTheme.colorScheme.onSurface,
             modifier = Modifier.padding(bottom = 8.dp)
         )
@@ -176,7 +195,6 @@ private fun PasswordField(
                 .fillMaxWidth()
                 .height(52.dp)
                 .background(
-                    // Fondo del campo de contrasenia (variante de superficie)
                     color = MaterialTheme.colorScheme.surfaceVariant,
                     shape = RoundedCornerShape(16.dp)
                 )
@@ -237,15 +255,5 @@ private fun PasswordField(
                 singleLine = true
             )
         }
-    }
-}
-
-@Preview(showBackground = true, widthDp = 430, heightDp = 932)
-@Composable
-fun PasswordSettingsScreenPreview() {
-    FinanceAppTheme(darkTheme = false) {
-        PasswordSettingsScreen(
-            darkTheme = false
-        )
     }
 }

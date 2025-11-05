@@ -1,8 +1,6 @@
 package com.example.financeapp.components
 
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
@@ -135,7 +133,6 @@ private fun NavBarItem(
     onClick: () -> Unit
 ) {
 
-    // --- 1. LÓGICA DE TINTE CORREGIDA ---
 
     // No Seleccionado: Color "on" del fondo de la barra
     val unselectedTint = if (!darkTheme) {
@@ -154,7 +151,6 @@ private fun NavBarItem(
 
     // Asignamos el tinte correcto
     val iconTint = if (isSelected) selectedTint else unselectedTint
-    // --- FIN DE CAMBIO 1 ---
 
     // Box contenedor del item (el "reborde seleccionado")
     Box(
@@ -165,10 +161,8 @@ private fun NavBarItem(
                 if (isSelected) {
                     Modifier
                         .clip(RoundedCornerShape(22.dp))
-                        // --- 2. CAMBIO DE .border A .background ---
                         // Usamos el color primario (#00D09E) como fondo
                         .background(MaterialTheme.colorScheme.primary)
-                    // --- FIN DE CAMBIO 2 ---
                 } else {
                     Modifier
                 }
@@ -185,7 +179,7 @@ private fun NavBarItem(
             painter = painterResource(id = icon),
             contentDescription = null,
             modifier = Modifier.size(width = iconWidth, height = iconHeight),
-            tint = iconTint // <-- Usamos el tinte corregido
+            tint = iconTint
         )
     }
 }

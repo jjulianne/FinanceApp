@@ -11,7 +11,7 @@ val PurpleGrey40 = Color(0xFF625b71)
 val Pink40 = Color(0xFF7D5260)
 
 // Colores de FinWise
-val FinWiseGreen = Color(0xFF00D09E)           // Color principal verde
+val FinWiseGreen = Color(0xFF00D09E)           // Color principal verde - Caribbean green
 val FinWiseLightGreen = Color(0xFFE8F5E9)      // Fondo claro
 val FinWiseSecondaryGreen = Color(0xFFD4F1E8)  // Botón secundario
 val FinWiseDarkGreen = Color(0xFF2D5F5D)       // Textos oscuros

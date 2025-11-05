@@ -18,33 +18,34 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.financeApp.R
 import com.example.financeapp.components.AppHeader
 import com.example.financeapp.components.BottomNavBar
-import com.example.financeapp.ui.theme.FinanceAppTheme
+import com.example.financeapp.components.LoadingScreen
 
 @Composable
 fun ChangePinScreen(
     darkTheme: Boolean,
     currentRoute: String = "profile_route",
+    viewModel: ChangePinViewModel = hiltViewModel(),
     onNavigateBack: () -> Unit = {},
-    onChangePin: () -> Unit = {},
     onNavigateToHome: () -> Unit = {},
     onNavigateToAnalysis: () -> Unit = {},
     onNavigateToTransactions: () -> Unit = {},
     onNavigateToCategory: () -> Unit = {},
     onNavigateToProfile: () -> Unit = {}
 ) {
-    var currentPin by remember { mutableStateOf("") }
-    var newPin by remember { mutableStateOf("") }
-    var confirmPin by remember { mutableStateOf("") }
+    val state by viewModel.uiState.collectAsState()
 
-    var currentPinVisible by remember { mutableStateOf(false) }
-    var newPinVisible by remember { mutableStateOf(false) }
-    var confirmPinVisible by remember { mutableStateOf(false) }
+    LaunchedEffect(key1 = Unit) {
+        viewModel.navigationEvents.collect {
+            onNavigateBack() // El VM nos ordena navegar
+        }
+    }
+
 
     Scaffold(
         bottomBar = {
@@ -91,10 +92,10 @@ fun ChangePinScreen(
                 // Current Pin
                 PinInputField(
                     label = "Current Pin",
-                    value = currentPin,
-                    onValueChange = { if (it.length <= 4) currentPin = it },
-                    isVisible = currentPinVisible,
-                    onToggleVisibility = { currentPinVisible = !currentPinVisible }
+                    value = state.currentPin, // 5. Usamos el estado
+                    onValueChange = viewModel::onCurrentPinChanged, // 6. Notificamos al VM
+                    isVisible = state.isCurrentPinVisible,
+                    onToggleVisibility = { viewModel.onToggleVisibility("current") }
                 )
 
                 Spacer(modifier = Modifier.height(24.dp))
@@ -102,10 +103,10 @@ fun ChangePinScreen(
                 // New Pin
                 PinInputField(
                     label = "New Pin",
-                    value = newPin,
-                    onValueChange = { if (it.length <= 4) newPin = it },
-                    isVisible = newPinVisible,
-                    onToggleVisibility = { newPinVisible = !newPinVisible }
+                    value = state.newPin,
+                    onValueChange = viewModel::onNewPinChanged,
+                    isVisible = state.isNewPinVisible,
+                    onToggleVisibility = { viewModel.onToggleVisibility("new") }
                 )
 
                 Spacer(modifier = Modifier.height(24.dp))
@@ -113,10 +114,10 @@ fun ChangePinScreen(
                 // Confirm Pin
                 PinInputField(
                     label = "Confirm Pin",
-                    value = confirmPin,
-                    onValueChange = { if (it.length <= 4) confirmPin = it },
-                    isVisible = confirmPinVisible,
-                    onToggleVisibility = { confirmPinVisible = !confirmPinVisible }
+                    value = state.confirmPin,
+                    onValueChange = viewModel::onConfirmPinChanged,
+                    isVisible = state.isConfirmPinVisible,
+                    onToggleVisibility = { viewModel.onToggleVisibility("confirm") }
                 )
 
                 Spacer(modifier = Modifier.height(48.dp))
@@ -127,7 +128,8 @@ fun ChangePinScreen(
                     contentAlignment = Alignment.Center
                 ) {
                     Button(
-                        onClick = onChangePin,
+                        onClick = viewModel::onChangePinClicked, // 7. Solo notificamos
+                        enabled = state.isButtonEnabled && !state.isLoading, // 8. El estado controla
                         modifier = Modifier
                             .width(207.dp)
                             .height(45.dp),
@@ -144,6 +146,27 @@ fun ChangePinScreen(
                         )
                     }
                 }
+            }
+
+            // 9. El estado controla los diálogos de éxito o error
+            if (state.showSuccess) {
+                LoadingScreen(
+                    message = "Pin Has Been\nChanged Successfully",
+                    isVisible = true,
+                    onDismiss = viewModel::onSuccessDialogDismissed,
+                    isError = false,
+                    durationMillis = 4000L
+                )
+            }
+
+            if (state.errorMessage != null) {
+                LoadingScreen(
+                    message = state.errorMessage!!,
+                    isVisible = true,
+                    onDismiss = viewModel::onErrorDialogDismissed,
+                    isError = true,
+                    durationMillis = 4000L
+                )
             }
         }
     }
@@ -227,20 +250,11 @@ private fun PinInputField(
                 value = value,
                 onValueChange = onValueChange,
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .offset(y = (-100).dp), // Fuera de vista
+                    .matchParentSize(),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword),
                 visualTransformation = if (isVisible) VisualTransformation.None else PasswordVisualTransformation(),
                 singleLine = true
             )
         }
-    }
-}
-
-@Preview(showBackground = true, widthDp = 430, heightDp = 932)
-@Composable
-fun ChangePinScreenPreview() {
-    FinanceAppTheme(darkTheme = false) { // Cambia a 'true' para probar modo oscuro
-        ChangePinScreen(darkTheme = false) // Cambia a 'true' para probar modo oscuro
     }
 }
