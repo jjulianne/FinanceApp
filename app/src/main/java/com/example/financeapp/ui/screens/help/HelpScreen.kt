@@ -420,7 +420,7 @@ private fun ContactItem(
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
-                    painter = painterResource(id = icon),
+                    painter = painterResource(id = R.drawable.help_white),
                     contentDescription = text,
                     modifier = Modifier.size(20.dp),
                     tint = Color.White
