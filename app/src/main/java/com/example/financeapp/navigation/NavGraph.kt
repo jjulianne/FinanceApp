@@ -45,6 +45,9 @@ import com.example.financeapp.ui.screens.balance.AccountBalanceScreen
 import com.example.financeapp.ui.screens.transactions.TransactionsScreen
 import com.example.financeapp.ui.screens.transactions.IncomeScreen
 import com.example.financeapp.ui.screens.transactions.ExpenseScreen
+import com.example.financeapp.ui.screens.category.CategoriesScreen
+import com.example.financeapp.ui.screens.category.FoodScreen
+import com.example.financeapp.ui.screens.expense.add_expense.AddExpenseScreen
 
 
 // Definicion de rutas de navegacion de la aplicacion
@@ -89,6 +92,9 @@ sealed class Screen(val route: String) {
         }
     }
     object AddFingerprint : Screen("add_fingerprint_route")         // Añadir huella
+    object Categories : Screen("category_route")
+    object Food : Screen("food_route")
+    object AddExpenses : Screen( "add_expense")
 
 
     // Rutas de Features principales
@@ -96,7 +102,6 @@ sealed class Screen(val route: String) {
     object Transactions : Screen("transactions_route")
     object Income : Screen("income_route")
     object Expense : Screen("expense_route")
-    object Category : Screen("category_route")
     object SavingGoals : Screen("saving_goals_route")
 
     object Help : Screen("help_route")
@@ -321,7 +326,7 @@ fun FinWiseNavigation(
                     }
                 },
                 onNavigateToCategory = {
-                    navController.navigate(Screen.Category.route) {
+                    navController.navigate(Screen.Categories.route) {
                         popUpTo(navController.graph.findStartDestination().id) { saveState = true }
                         launchSingleTop = true
                         restoreState = true
@@ -377,7 +382,7 @@ fun FinWiseNavigation(
                     }
                 },
                 onNavigateToCategory = {
-                    navController.navigate(Screen.Category.route) {
+                    navController.navigate(Screen.Categories.route) {
                         popUpTo(navController.graph.findStartDestination().id) { saveState = true }
                         launchSingleTop = true
                         restoreState = true
@@ -417,7 +422,7 @@ fun FinWiseNavigation(
                     }
                 },
                 onNavigateToCategory = {
-                    navController.navigate(Screen.Category.route) {
+                    navController.navigate(Screen.Categories.route) {
                         popUpTo(navController.graph.findStartDestination().id) { saveState = true }
                         launchSingleTop = true
                         restoreState = true
@@ -446,13 +451,33 @@ fun FinWiseNavigation(
                 // Callbacks del BottomNavBar
                 onNavigateToHome = {
                     navController.navigate(Screen.Home.route) {
-                        popUpTo(navController.graph.startDestinationRoute!!) { saveState = true }
+                        popUpTo(navController.graph.findStartDestination().id) { saveState = true }
+                        launchSingleTop = true
+                        restoreState = true
                     }
                 },
-                onNavigateToAnalysis = { /* Falta implementar */ },
-                onNavigateToTransactions = { /* Falta implementar */ },
-                onNavigateToCategory = { /* Falta implementar */ },
-                onNavigateToProfile = { navController.navigate(Screen.Profile.route) }
+                onNavigateToAnalysis = {
+                    navController.navigate(Screen.Analysis.route) {
+                        popUpTo(navController.graph.findStartDestination().id) { saveState = true }
+                        launchSingleTop = true
+                        restoreState = true
+                    }
+                },
+                onNavigateToTransactions = {
+                    navController.navigate(Screen.Transactions.route) {
+                        popUpTo(navController.graph.findStartDestination().id) { saveState = true }
+                        launchSingleTop = true
+                        restoreState = true
+                    }
+                },
+                onNavigateToCategory = {
+                    navController.navigate(Screen.Categories.route) {
+                        popUpTo(navController.graph.findStartDestination().id) { saveState = true }
+                        launchSingleTop = true
+                        restoreState = true
+                    }
+                },
+                onNavigateToProfile = { navController.popBackStack() }
             )
         }
 
@@ -466,13 +491,33 @@ fun FinWiseNavigation(
                 // Callbacks del BottomNavBar
                 onNavigateToHome = {
                     navController.navigate(Screen.Home.route) {
-                        popUpTo(navController.graph.startDestinationRoute!!) { saveState = true }
+                        popUpTo(navController.graph.findStartDestination().id) { saveState = true }
+                        launchSingleTop = true
+                        restoreState = true
                     }
                 },
-                onNavigateToAnalysis = { /* Falta implementar */ },
-                onNavigateToTransactions = { /* Falta implementar */ },
-                onNavigateToCategory = { /* Falta implementar */ },
-                onNavigateToProfile = { navController.navigate(Screen.Profile.route) }
+                onNavigateToAnalysis = {
+                    navController.navigate(Screen.Analysis.route) {
+                        popUpTo(navController.graph.findStartDestination().id) { saveState = true }
+                        launchSingleTop = true
+                        restoreState = true
+                    }
+                },
+                onNavigateToTransactions = {
+                    navController.navigate(Screen.Transactions.route) {
+                        popUpTo(navController.graph.findStartDestination().id) { saveState = true }
+                        launchSingleTop = true
+                        restoreState = true
+                    }
+                },
+                onNavigateToCategory = {
+                    navController.navigate(Screen.Categories.route) {
+                        popUpTo(navController.graph.findStartDestination().id) { saveState = true }
+                        launchSingleTop = true
+                        restoreState = true
+                    }
+                },
+                onNavigateToProfile = { navController.popBackStack() }
             )
         }
 
@@ -486,13 +531,33 @@ fun FinWiseNavigation(
                 // Callbacks del BottomNavBar
                 onNavigateToHome = {
                     navController.navigate(Screen.Home.route) {
-                        popUpTo(navController.graph.startDestinationRoute!!) { saveState = true }
+                        popUpTo(navController.graph.findStartDestination().id) { saveState = true }
+                        launchSingleTop = true
+                        restoreState = true
                     }
                 },
-                onNavigateToAnalysis = { /* Falta implementar */ },
-                onNavigateToTransactions = { /* Falta implementar */ },
-                onNavigateToCategory = { /* Falta implementar */ },
-                onNavigateToProfile = { navController.navigate(Screen.Profile.route) }
+                onNavigateToAnalysis = {
+                    navController.navigate(Screen.Analysis.route) {
+                        popUpTo(navController.graph.findStartDestination().id) { saveState = true }
+                        launchSingleTop = true
+                        restoreState = true
+                    }
+                },
+                onNavigateToTransactions = {
+                    navController.navigate(Screen.Transactions.route) {
+                        popUpTo(navController.graph.findStartDestination().id) { saveState = true }
+                        launchSingleTop = true
+                        restoreState = true
+                    }
+                },
+                onNavigateToCategory = {
+                    navController.navigate(Screen.Categories.route) {
+                        popUpTo(navController.graph.findStartDestination().id) { saveState = true }
+                        launchSingleTop = true
+                        restoreState = true
+                    }
+                },
+                onNavigateToProfile = { navController.popBackStack() }
             )
         }
 
@@ -506,13 +571,33 @@ fun FinWiseNavigation(
                 // Callbacks del BottomNavBar
                 onNavigateToHome = {
                     navController.navigate(Screen.Home.route) {
-                        popUpTo(navController.graph.startDestinationRoute!!) { saveState = true }
+                        popUpTo(navController.graph.findStartDestination().id) { saveState = true }
+                        launchSingleTop = true
+                        restoreState = true
                     }
                 },
-                onNavigateToAnalysis = { /* Falta implementar */ },
-                onNavigateToTransactions = { /* Falta implementar */ },
-                onNavigateToCategory = { /* Falta implementar */ },
-                onNavigateToProfile = { navController.navigate(Screen.Profile.route) }
+                onNavigateToAnalysis = {
+                    navController.navigate(Screen.Analysis.route) {
+                        popUpTo(navController.graph.findStartDestination().id) { saveState = true }
+                        launchSingleTop = true
+                        restoreState = true
+                    }
+                },
+                onNavigateToTransactions = {
+                    navController.navigate(Screen.Transactions.route) {
+                        popUpTo(navController.graph.findStartDestination().id) { saveState = true }
+                        launchSingleTop = true
+                        restoreState = true
+                    }
+                },
+                onNavigateToCategory = {
+                    navController.navigate(Screen.Categories.route) {
+                        popUpTo(navController.graph.findStartDestination().id) { saveState = true }
+                        launchSingleTop = true
+                        restoreState = true
+                    }
+                },
+                onNavigateToProfile = { navController.popBackStack() }
             )
         }
 
@@ -529,13 +614,33 @@ fun FinWiseNavigation(
                 // Callbacks del BottomNavBar
                 onNavigateToHome = {
                     navController.navigate(Screen.Home.route) {
-                        popUpTo(navController.graph.startDestinationRoute!!) { saveState = true }
+                        popUpTo(navController.graph.findStartDestination().id) { saveState = true }
+                        launchSingleTop = true
+                        restoreState = true
                     }
                 },
-                onNavigateToAnalysis = { /* Falta implementar */ },
-                onNavigateToTransactions = { /* Falta implementar */ },
-                onNavigateToCategory = { /* Falta implementar */ },
-                onNavigateToProfile = { navController.navigate(Screen.Profile.route) }
+                onNavigateToAnalysis = {
+                    navController.navigate(Screen.Analysis.route) {
+                        popUpTo(navController.graph.findStartDestination().id) { saveState = true }
+                        launchSingleTop = true
+                        restoreState = true
+                    }
+                },
+                onNavigateToTransactions = {
+                    navController.navigate(Screen.Transactions.route) {
+                        popUpTo(navController.graph.findStartDestination().id) { saveState = true }
+                        launchSingleTop = true
+                        restoreState = true
+                    }
+                },
+                onNavigateToCategory = {
+                    navController.navigate(Screen.Categories.route) {
+                        popUpTo(navController.graph.findStartDestination().id) { saveState = true }
+                        launchSingleTop = true
+                        restoreState = true
+                    }
+                },
+                onNavigateToProfile = { navController.popBackStack() }
             )
         }
 
@@ -552,13 +657,33 @@ fun FinWiseNavigation(
                 // Callbacks del BottomNavBar
                 onNavigateToHome = {
                     navController.navigate(Screen.Home.route) {
-                        popUpTo(navController.graph.startDestinationRoute!!) { saveState = true }
+                        popUpTo(navController.graph.findStartDestination().id) { saveState = true }
+                        launchSingleTop = true
+                        restoreState = true
                     }
                 },
-                onNavigateToAnalysis = { /* Falta implementar */ },
-                onNavigateToTransactions = { /* Falta implementar */ },
-                onNavigateToCategory = { /* Falta implementar */ },
-                onNavigateToProfile = { navController.navigate(Screen.Profile.route) }
+                onNavigateToAnalysis = {
+                    navController.navigate(Screen.Analysis.route) {
+                        popUpTo(navController.graph.findStartDestination().id) { saveState = true }
+                        launchSingleTop = true
+                        restoreState = true
+                    }
+                },
+                onNavigateToTransactions = {
+                    navController.navigate(Screen.Transactions.route) {
+                        popUpTo(navController.graph.findStartDestination().id) { saveState = true }
+                        launchSingleTop = true
+                        restoreState = true
+                    }
+                },
+                onNavigateToCategory = {
+                    navController.navigate(Screen.Categories.route) {
+                        popUpTo(navController.graph.findStartDestination().id) { saveState = true }
+                        launchSingleTop = true
+                        restoreState = true
+                    }
+                },
+                onNavigateToProfile = { navController.popBackStack() }
             )
         }
 
@@ -578,11 +703,35 @@ fun FinWiseNavigation(
                 onNavigateBack = { navController.popBackStack() },
 
                 // Callbacks del BottomNavBar
-                onNavigateToHome = { navController.navigate(Screen.Home.route) { popUpTo(navController.graph.startDestinationRoute!!) { saveState = true } } },
-                onNavigateToAnalysis = { /* Falta implementar */ },
-                onNavigateToTransactions = { /* Falta implementar */ },
-                onNavigateToCategory = { /* Falta implementar */ },
-                onNavigateToProfile = { navController.navigate(Screen.Profile.route) }
+                onNavigateToHome = {
+                    navController.navigate(Screen.Home.route) {
+                        popUpTo(navController.graph.findStartDestination().id) { saveState = true }
+                        launchSingleTop = true
+                        restoreState = true
+                    }
+                },
+                onNavigateToAnalysis = {
+                    navController.navigate(Screen.Analysis.route) {
+                        popUpTo(navController.graph.findStartDestination().id) { saveState = true }
+                        launchSingleTop = true
+                        restoreState = true
+                    }
+                },
+                onNavigateToTransactions = {
+                    navController.navigate(Screen.Transactions.route) {
+                        popUpTo(navController.graph.findStartDestination().id) { saveState = true }
+                        launchSingleTop = true
+                        restoreState = true
+                    }
+                },
+                onNavigateToCategory = {
+                    navController.navigate(Screen.Categories.route) {
+                        popUpTo(navController.graph.findStartDestination().id) { saveState = true }
+                        launchSingleTop = true
+                        restoreState = true
+                    }
+                },
+                onNavigateToProfile = { navController.popBackStack() }
             )
         }
 
@@ -605,13 +754,33 @@ fun FinWiseNavigation(
                 // Callbacks del BottomNavBar
                 onNavigateToHome = {
                     navController.navigate(Screen.Home.route) {
-                        popUpTo(navController.graph.startDestinationRoute!!) { saveState = true }
+                        popUpTo(navController.graph.findStartDestination().id) { saveState = true }
+                        launchSingleTop = true
+                        restoreState = true
                     }
                 },
-                onNavigateToAnalysis = { /* Falta implementar */ },
-                onNavigateToTransactions = { /* Falta implementar */ },
-                onNavigateToCategory = { /* Falta implementar */ },
-                onNavigateToProfile = { navController.navigate(Screen.Profile.route) }
+                onNavigateToAnalysis = {
+                    navController.navigate(Screen.Analysis.route) {
+                        popUpTo(navController.graph.findStartDestination().id) { saveState = true }
+                        launchSingleTop = true
+                        restoreState = true
+                    }
+                },
+                onNavigateToTransactions = {
+                    navController.navigate(Screen.Transactions.route) {
+                        popUpTo(navController.graph.findStartDestination().id) { saveState = true }
+                        launchSingleTop = true
+                        restoreState = true
+                    }
+                },
+                onNavigateToCategory = {
+                    navController.navigate(Screen.Categories.route) {
+                        popUpTo(navController.graph.findStartDestination().id) { saveState = true }
+                        launchSingleTop = true
+                        restoreState = true
+                    }
+                },
+                onNavigateToProfile = { navController.popBackStack() }
             )
         }
 
@@ -625,13 +794,33 @@ fun FinWiseNavigation(
                 // Callbacks del BottomNavBar
                 onNavigateToHome = {
                     navController.navigate(Screen.Home.route) {
-                        popUpTo(navController.graph.startDestinationRoute!!) { saveState = true }
+                        popUpTo(navController.graph.findStartDestination().id) { saveState = true }
+                        launchSingleTop = true
+                        restoreState = true
                     }
                 },
-                onNavigateToAnalysis = { /* Falta implementar */ },
-                onNavigateToTransactions = { /* Falta implementar */ },
-                onNavigateToCategory = { /* Falta implementar */ },
-                onNavigateToProfile = { navController.navigate(Screen.Profile.route) }
+                onNavigateToAnalysis = {
+                    navController.navigate(Screen.Analysis.route) {
+                        popUpTo(navController.graph.findStartDestination().id) { saveState = true }
+                        launchSingleTop = true
+                        restoreState = true
+                    }
+                },
+                onNavigateToTransactions = {
+                    navController.navigate(Screen.Transactions.route) {
+                        popUpTo(navController.graph.findStartDestination().id) { saveState = true }
+                        launchSingleTop = true
+                        restoreState = true
+                    }
+                },
+                onNavigateToCategory = {
+                    navController.navigate(Screen.Categories.route) {
+                        popUpTo(navController.graph.findStartDestination().id) { saveState = true }
+                        launchSingleTop = true
+                        restoreState = true
+                    }
+                },
+                onNavigateToProfile = { navController.popBackStack() }
             )
         }
 
@@ -651,13 +840,33 @@ fun FinWiseNavigation(
                 // CallVbacks del BottomNavBar
                 onNavigateToHome = {
                     navController.navigate(Screen.Home.route) {
-                        popUpTo(navController.graph.startDestinationRoute!!) { saveState = true }
+                        popUpTo(navController.graph.findStartDestination().id) { saveState = true }
+                        launchSingleTop = true
+                        restoreState = true
                     }
                 },
-                onNavigateToAnalysis = { /* Falta implementar */ },
-                onNavigateToTransactions = { /* Falta implementar */ },
-                onNavigateToCategory = { /* Falta implementar */ },
-                onNavigateToProfile = { navController.navigate(Screen.Profile.route) }
+                onNavigateToAnalysis = {
+                    navController.navigate(Screen.Analysis.route) {
+                        popUpTo(navController.graph.findStartDestination().id) { saveState = true }
+                        launchSingleTop = true
+                        restoreState = true
+                    }
+                },
+                onNavigateToTransactions = {
+                    navController.navigate(Screen.Transactions.route) {
+                        popUpTo(navController.graph.findStartDestination().id) { saveState = true }
+                        launchSingleTop = true
+                        restoreState = true
+                    }
+                },
+                onNavigateToCategory = {
+                    navController.navigate(Screen.Categories.route) {
+                        popUpTo(navController.graph.findStartDestination().id) { saveState = true }
+                        launchSingleTop = true
+                        restoreState = true
+                    }
+                },
+                onNavigateToProfile = { navController.popBackStack() }
             )
         }
 
@@ -682,13 +891,33 @@ fun FinWiseNavigation(
                 // Callbacks del BottomNavBar
                 onNavigateToHome = {
                     navController.navigate(Screen.Home.route) {
-                        popUpTo(navController.graph.startDestinationRoute!!) { saveState = true }
+                        popUpTo(navController.graph.findStartDestination().id) { saveState = true }
+                        launchSingleTop = true
+                        restoreState = true
                     }
                 },
-                onNavigateToAnalysis = { /* Falta implementar */ },
-                onNavigateToTransactions = { /* Falta implementar */ },
-                onNavigateToCategory = { /* Falta implementar */ },
-                onNavigateToProfile = { navController.navigate(Screen.Profile.route) }
+                onNavigateToAnalysis = {
+                    navController.navigate(Screen.Analysis.route) {
+                        popUpTo(navController.graph.findStartDestination().id) { saveState = true }
+                        launchSingleTop = true
+                        restoreState = true
+                    }
+                },
+                onNavigateToTransactions = {
+                    navController.navigate(Screen.Transactions.route) {
+                        popUpTo(navController.graph.findStartDestination().id) { saveState = true }
+                        launchSingleTop = true
+                        restoreState = true
+                    }
+                },
+                onNavigateToCategory = {
+                    navController.navigate(Screen.Categories.route) {
+                        popUpTo(navController.graph.findStartDestination().id) { saveState = true }
+                        launchSingleTop = true
+                        restoreState = true
+                    }
+                },
+                onNavigateToProfile = { navController.popBackStack() }
             )
         }
 
@@ -701,13 +930,33 @@ fun FinWiseNavigation(
                 // Callbacks del BottomNavBar
                 onNavigateToHome = {
                     navController.navigate(Screen.Home.route) {
-                        popUpTo(navController.graph.startDestinationRoute!!) { saveState = true }
+                        popUpTo(navController.graph.findStartDestination().id) { saveState = true }
+                        launchSingleTop = true
+                        restoreState = true
                     }
                 },
-                onNavigateToAnalysis = { /* Falta implementar */ },
-                onNavigateToTransactions = { /* Falta implementar */ },
-                onNavigateToCategory = { /* Falta implementar */ },
-                onNavigateToProfile = { navController.navigate(Screen.Profile.route) }
+                onNavigateToAnalysis = {
+                    navController.navigate(Screen.Analysis.route) {
+                        popUpTo(navController.graph.findStartDestination().id) { saveState = true }
+                        launchSingleTop = true
+                        restoreState = true
+                    }
+                },
+                onNavigateToTransactions = {
+                    navController.navigate(Screen.Transactions.route) {
+                        popUpTo(navController.graph.findStartDestination().id) { saveState = true }
+                        launchSingleTop = true
+                        restoreState = true
+                    }
+                },
+                onNavigateToCategory = {
+                    navController.navigate(Screen.Categories.route) {
+                        popUpTo(navController.graph.findStartDestination().id) { saveState = true }
+                        launchSingleTop = true
+                        restoreState = true
+                    }
+                },
+                onNavigateToProfile = { navController.popBackStack() }
             )
         }
 
@@ -725,13 +974,33 @@ fun FinWiseNavigation(
                 // Callbacks del BottomNavBar
                 onNavigateToHome = {
                     navController.navigate(Screen.Home.route) {
-                        popUpTo(navController.graph.startDestinationRoute!!) { saveState = true }
+                        popUpTo(navController.graph.findStartDestination().id) { saveState = true }
+                        launchSingleTop = true
+                        restoreState = true
                     }
                 },
-                onNavigateToAnalysis = { /* Falta implementar */ },
-                onNavigateToTransactions = { /* Falta implementar */ },
-                onNavigateToCategory = { /* Falta implementar */ },
-                onNavigateToProfile = { navController.navigate(Screen.Profile.route) }
+                onNavigateToAnalysis = {
+                    navController.navigate(Screen.Analysis.route) {
+                        popUpTo(navController.graph.findStartDestination().id) { saveState = true }
+                        launchSingleTop = true
+                        restoreState = true
+                    }
+                },
+                onNavigateToTransactions = {
+                    navController.navigate(Screen.Transactions.route) {
+                        popUpTo(navController.graph.findStartDestination().id) { saveState = true }
+                        launchSingleTop = true
+                        restoreState = true
+                    }
+                },
+                onNavigateToCategory = {
+                    navController.navigate(Screen.Categories.route) {
+                        popUpTo(navController.graph.findStartDestination().id) { saveState = true }
+                        launchSingleTop = true
+                        restoreState = true
+                    }
+                },
+                onNavigateToProfile = { navController.popBackStack() }
             )
         }
         // Aca van mas pantallas (ejemplo)
@@ -763,7 +1032,7 @@ fun FinWiseNavigation(
                     }
                 },
                 onNavigateToCategory = {
-                    navController.navigate(Screen.Category.route) {
+                    navController.navigate(Screen.Categories.route) {
                         popUpTo(navController.graph.findStartDestination().id) { saveState = true }
                         launchSingleTop = true
                         restoreState = true
@@ -802,7 +1071,7 @@ fun FinWiseNavigation(
                 },
                 onNavigateToTransactions = { /* Ya estás aquí */ },
                 onNavigateToCategory = {
-                    navController.navigate(Screen.Category.route) {
+                    navController.navigate(Screen.Categories.route) {
                         popUpTo(navController.graph.findStartDestination().id) { saveState = true }
                         launchSingleTop = true
                         restoreState = true
@@ -847,7 +1116,7 @@ fun FinWiseNavigation(
                     }
                 },
                 onNavigateToCategory = {
-                    navController.navigate(Screen.Category.route) {
+                    navController.navigate(Screen.Categories.route) {
                         popUpTo(navController.graph.findStartDestination().id) { saveState = true }
                         launchSingleTop = true
                         restoreState = true
@@ -892,7 +1161,7 @@ fun FinWiseNavigation(
                     }
                 },
                 onNavigateToCategory = {
-                    navController.navigate(Screen.Category.route) {
+                    navController.navigate(Screen.Categories.route) {
                         popUpTo(navController.graph.findStartDestination().id) { saveState = true }
                         launchSingleTop = true
                         restoreState = true
@@ -908,8 +1177,17 @@ fun FinWiseNavigation(
             )
         }
 
-        composable(Screen.Category.route) {
-            PlaceholderScreen("Category Screen") // Falta la logica
+        composable(Screen.Categories.route) {
+            CategoriesScreen(navController = navController, darkTheme = false)
+        }
+        composable(Screen.Food.route) {
+            FoodScreen(
+                navController = navController, darkTheme = false)
+        }
+        composable(Screen.AddExpenses.route) {
+            AddExpenseScreen(
+                darkTheme = false
+            )
         }
 
     }
