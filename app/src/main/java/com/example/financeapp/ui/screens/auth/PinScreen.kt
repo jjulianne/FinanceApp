@@ -20,12 +20,12 @@ import com.example.financeapp.ui.theme.FinWiseDarkGreen
 import com.example.financeapp.ui.theme.FinWiseGreen
 
 @Composable
-fun SecurityPinScreen(
+fun PinScreen(
     onAccept: () -> Unit = {},
     onResend: () -> Unit = {},
     onNavigateToSignUp: () -> Unit = {}
 ) {
-    val pinDigits = listOf("2", "7", "3", "9", "1", "6")
+    val pinDigits = listOf("2", "7", "3", "9", "1")
 
     AuthScreenLayout(title = "Security PIN") {
 
@@ -115,7 +115,7 @@ fun SecurityPinScreen(
 
 @Preview(showBackground = true, widthDp = 430, heightDp = 932)
 @Composable
-fun SecurityPinScreenPreview() {
-    SecurityPinScreen()
+fun PinScreenPreview() {
+    PinScreen()
 }
 
