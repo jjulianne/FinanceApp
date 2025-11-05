@@ -7,6 +7,17 @@ interface AuthRepository {
     suspend fun isWelcomed(): Boolean
     suspend fun isUserLoggedIn(): Boolean
 
+    // Aca iria la logica del login
+    /**
+     * Comprueba si la contraseña actual proporcionada es correcta.
+     */
+    suspend fun checkPassword(password: String): Boolean
+
+    /**
+     * Guarda la nueva contraseña del usuario.
+     */
+    suspend fun savePassword(password: String)
+}
     // Nuevo método: login con credenciales
     suspend fun login(email: String, password: String): User
 

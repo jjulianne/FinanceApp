@@ -10,9 +10,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.example.financeapp.ui.screens.launch.Onboarding1Screen
 import com.example.financeapp.ui.screens.launch.Onboarding2Screen
 import com.example.financeapp.ui.screens.launch.WelcomeScreen
@@ -26,6 +28,19 @@ import com.example.financeapp.ui.screens.auth.SecurityPinScreen
 import com.example.financeapp.ui.screens.home.HomeScreen
 import com.example.financeapp.ui.screens.profile.ProfileScreen
 import com.example.financeapp.ui.screens.profile.edit_profile.EditProfileScreen
+import com.example.financeapp.ui.screens.settings.SettingsScreen
+import com.example.financeapp.ui.screens.settings.NotificationSettingsScreen
+import com.example.financeapp.ui.screens.settings.PasswordSettingsScreen
+import com.example.financeapp.ui.screens.settings.DeleteAccountScreen
+import com.example.financeapp.ui.screens.help.HelpScreen
+import com.example.financeapp.ui.screens.help.OnlineSupportScreen
+import com.example.financeapp.ui.screens.help.SupportChatScreen
+import com.example.financeapp.ui.screens.security.AddFingerprintScreen
+import com.example.financeapp.ui.screens.security.SecurityScreen
+import com.example.financeapp.ui.screens.security.ChangePinScreen
+import com.example.financeapp.ui.screens.security.FingerprintScreen
+import com.example.financeapp.ui.screens.security.FingerprintDetailScreen
+import com.example.financeapp.ui.screens.security.TermsAndConditionsScreen
 
 
 // Definicion de rutas de navegacion de la aplicacion
@@ -53,13 +68,38 @@ sealed class Screen(val route: String) {
     // Rutas de Perfil y Configuración
     object Profile : Screen("profile_route")
     object EditProfile : Screen("edit_profile_route")
-    object Settings : Screen("settings_route")
     object Security : Screen("security_route")
+    object ChangePin : Screen("change_pin_route")                   // Cambiar PIN
+    object Fingerprint : Screen("fingerprint_route")                // Configurar huella
+    object TermsAndConditions : Screen("terms_conditions_route")    // Términos y condiciones
+    object Settings : Screen("settings_route")                      // Configuracion general
+    object NotificationSettings : Screen("notification_settings_route")  // Configuracion de notificaciones
+    object PasswordSettings : Screen("password_settings_route")          // Cambiar contraseña
+    object DeleteAccount : Screen("delete_account_route")                // Eliminar cuenta
+
+    // Usamos "{fingerprintName}" para pasar el nombre como argumento en la URL.
+    object FingerprintDetail : Screen("fingerprint_detail_route/{fingerprintName}") {
+        // Funcion helper para construir la ruta con el argumento
+        fun withArgs(name: String): String {
+            return "fingerprint_detail_route/$name"
+        }
+    }
+    object AddFingerprint : Screen("add_fingerprint_route")         // Añadir huella
+
+
+    // Rutas de Features principales
     object Analysis : Screen("analysis_route")
     object Transactions : Screen("transactions_route")
     object Category : Screen("category_route")
     object SavingGoals : Screen("saving_goals_route")
 
+    object Help : Screen("help_route")
+    object OnlineSupport : Screen("online_support_route")
+    object SupportChat : Screen("support_chat_route/{chatId}") {
+        fun withArgs(chatId: String): String {
+            return "support_chat_route/$chatId"
+        }
+    }
 }
 
 @SuppressLint("ComposableDestinationInComposeScope")
@@ -296,9 +336,9 @@ fun FinWiseNavigation(
                 darkTheme = isDarkTheme,
                 onNavigateBack = { navController.popBackStack() },
                 onNavigateToEditProfile = { navController.navigate(route = Screen.EditProfile.route) },
-                onNavigateToSecurity = { /* Falta implementar */ },
-                onNavigateToSettings = { /* Falta implementar */ },
-                onNavigateToHelp = { /* Falta implementar */ },
+                onNavigateToSecurity = { navController.navigate(Screen.Security.route) },
+                onNavigateToSettings = { navController.navigate(Screen.Settings.route) },
+                onNavigateToHelp = { navController.navigate(Screen.Help.route) },
                 onLogout = { /* Falta implementar */ },
 
                 // Callbacks del BottomNavBar
@@ -375,6 +415,313 @@ fun FinWiseNavigation(
             )
         }
 
+        // Pantalla Settings (Configuracion general)
+        composable(Screen.Settings.route) {
+            SettingsScreen(
+                darkTheme = isDarkTheme,
+                currentRoute = Screen.Profile.route, // Mantiene Profile seleccionado en navbar
+                onNavigateBack = { navController.popBackStack() },
+                onNavigateToNotificationSettings = {
+                    navController.navigate(Screen.NotificationSettings.route)
+                },
+                onNavigateToPasswordSettings = {
+                    navController.navigate(Screen.PasswordSettings.route)
+                },
+                onNavigateToDeleteAccount = {
+                    navController.navigate(Screen.DeleteAccount.route)
+                },
+
+                // Callbacks del BottomNavBar
+                onNavigateToHome = {
+                    navController.navigate(Screen.Home.route) {
+                        popUpTo(navController.graph.startDestinationRoute!!) { saveState = true }
+                    }
+                },
+                onNavigateToAnalysis = { /* Falta implementar */ },
+                onNavigateToTransactions = { /* Falta implementar */ },
+                onNavigateToCategory = { /* Falta implementar */ },
+                onNavigateToProfile = { navController.navigate(Screen.Profile.route) }
+            )
+        }
+
+        // Pantalla Notification Settings
+        composable(Screen.NotificationSettings.route) {
+            NotificationSettingsScreen(
+                darkTheme = isDarkTheme,
+                currentRoute = Screen.Profile.route, // Mantiene Profile seleccionado en navbar
+                onNavigateBack = { navController.popBackStack() },
+
+                // Callbacks del BottomNavBar
+                onNavigateToHome = {
+                    navController.navigate(Screen.Home.route) {
+                        popUpTo(navController.graph.startDestinationRoute!!) { saveState = true }
+                    }
+                },
+                onNavigateToAnalysis = { /* Falta implementar */ },
+                onNavigateToTransactions = { /* Falta implementar */ },
+                onNavigateToCategory = { /* Falta implementar */ },
+                onNavigateToProfile = { navController.navigate(Screen.Profile.route) }
+            )
+        }
+
+        // Pantalla Password Settings
+        composable(Screen.PasswordSettings.route) {
+            PasswordSettingsScreen(
+                darkTheme = isDarkTheme,
+                currentRoute = Screen.Profile.route, // Mantiene Profile seleccionado en navbar
+                onNavigateBack = { navController.popBackStack() },
+
+                // Callbacks del BottomNavBar
+                onNavigateToHome = {
+                    navController.navigate(Screen.Home.route) {
+                        popUpTo(navController.graph.startDestinationRoute!!) { saveState = true }
+                    }
+                },
+                onNavigateToAnalysis = { /* Falta implementar */ },
+                onNavigateToTransactions = { /* Falta implementar */ },
+                onNavigateToCategory = { /* Falta implementar */ },
+                onNavigateToProfile = { navController.navigate(Screen.Profile.route) }
+            )
+        }
+
+        // Pantalla Delete Account
+        composable(Screen.DeleteAccount.route) {
+            DeleteAccountScreen(
+                darkTheme = isDarkTheme,
+                currentRoute = Screen.Profile.route, // Mantiene Profile seleccionado en navbar
+                onNavigateBack = { navController.popBackStack() },
+
+                // Callbacks del BottomNavBar
+                onNavigateToHome = {
+                    navController.navigate(Screen.Home.route) {
+                        popUpTo(navController.graph.startDestinationRoute!!) { saveState = true }
+                    }
+                },
+                onNavigateToAnalysis = { /* Falta implementar */ },
+                onNavigateToTransactions = { /* Falta implementar */ },
+                onNavigateToCategory = { /* Falta implementar */ },
+                onNavigateToProfile = { navController.navigate(Screen.Profile.route) }
+            )
+        }
+
+        composable(Screen.Help.route) {
+            HelpScreen(
+                darkTheme = isDarkTheme,
+                currentRoute = Screen.Profile.route,
+                onNavigateBack = { navController.popBackStack() },
+
+                onNavigateToCustomerService = {
+                    navController.navigate(Screen.OnlineSupport.route)
+                },
+
+                // Callbacks del BottomNavBar
+                onNavigateToHome = {
+                    navController.navigate(Screen.Home.route) {
+                        popUpTo(navController.graph.startDestinationRoute!!) { saveState = true }
+                    }
+                },
+                onNavigateToAnalysis = { /* Falta implementar */ },
+                onNavigateToTransactions = { /* Falta implementar */ },
+                onNavigateToCategory = { /* Falta implementar */ },
+                onNavigateToProfile = { navController.navigate(Screen.Profile.route) }
+            )
+        }
+
+        composable(Screen.OnlineSupport.route) {
+            OnlineSupportScreen(
+                darkTheme = isDarkTheme,
+                currentRoute = Screen.Profile.route, // Mantiene Profile seleccionado
+                onNavigateBack = { navController.popBackStack() },
+
+                onNavigateToChat = { chatId ->
+                    navController.navigate(Screen.SupportChat.withArgs(chatId))
+                },
+
+                // Callbacks del BottomNavBar
+                onNavigateToHome = {
+                    navController.navigate(Screen.Home.route) {
+                        popUpTo(navController.graph.startDestinationRoute!!) { saveState = true }
+                    }
+                },
+                onNavigateToAnalysis = { /* Falta implementar */ },
+                onNavigateToTransactions = { /* Falta implementar */ },
+                onNavigateToCategory = { /* Falta implementar */ },
+                onNavigateToProfile = { navController.navigate(Screen.Profile.route) }
+            )
+        }
+
+        composable(
+            route = Screen.SupportChat.route, // Usa la plantilla "support_chat_route/{chatId}"
+            arguments = listOf(
+                navArgument("chatId") {
+                    type = NavType.StringType
+                    nullable = true
+                    defaultValue = null
+                }
+            )
+        ) {
+            SupportChatScreen(
+                darkTheme = isDarkTheme,
+                currentRoute = Screen.Profile.route, // Mantiene Profile seleccionado
+                onNavigateBack = { navController.popBackStack() },
+
+                // Callbacks del BottomNavBar
+                onNavigateToHome = { navController.navigate(Screen.Home.route) { popUpTo(navController.graph.startDestinationRoute!!) { saveState = true } } },
+                onNavigateToAnalysis = { /* Falta implementar */ },
+                onNavigateToTransactions = { /* Falta implementar */ },
+                onNavigateToCategory = { /* Falta implementar */ },
+                onNavigateToProfile = { navController.navigate(Screen.Profile.route) }
+            )
+        }
+
+
+        composable(Screen.Security.route) {
+            SecurityScreen(
+                darkTheme = isDarkTheme,
+                currentRoute = Screen.Profile.route, // Mantiene Profile seleccionado en navbar
+                onNavigateBack = { navController.popBackStack() },
+                onNavigateToChangePin = {
+                    navController.navigate(Screen.ChangePin.route)
+                },
+                onNavigateToFingerprint = {
+                    navController.navigate(Screen.Fingerprint.route)
+                },
+                onNavigateToTermsAndConditions = {
+                    navController.navigate(Screen.TermsAndConditions.route)
+                },
+
+                // Callbacks del BottomNavBar
+                onNavigateToHome = {
+                    navController.navigate(Screen.Home.route) {
+                        popUpTo(navController.graph.startDestinationRoute!!) { saveState = true }
+                    }
+                },
+                onNavigateToAnalysis = { /* Falta implementar */ },
+                onNavigateToTransactions = { /* Falta implementar */ },
+                onNavigateToCategory = { /* Falta implementar */ },
+                onNavigateToProfile = { navController.navigate(Screen.Profile.route) }
+            )
+        }
+
+        // Pantalla Change Pin
+        composable(Screen.ChangePin.route) {
+            ChangePinScreen(
+                darkTheme = isDarkTheme,
+                currentRoute = Screen.Profile.route, // Mantiene Profile seleccionado en navbar
+                onNavigateBack = { navController.popBackStack() },
+
+                // Callbacks del BottomNavBar
+                onNavigateToHome = {
+                    navController.navigate(Screen.Home.route) {
+                        popUpTo(navController.graph.startDestinationRoute!!) { saveState = true }
+                    }
+                },
+                onNavigateToAnalysis = { /* Falta implementar */ },
+                onNavigateToTransactions = { /* Falta implementar */ },
+                onNavigateToCategory = { /* Falta implementar */ },
+                onNavigateToProfile = { navController.navigate(Screen.Profile.route) }
+            )
+        }
+
+        // Pantalla Fingerprint
+        composable(Screen.Fingerprint.route) {
+            FingerprintScreen(
+                darkTheme = isDarkTheme,
+                currentRoute = Screen.Profile.route, // Mantiene Profile seleccionado en navbar
+                onNavigateBack = { navController.popBackStack() },
+                onViewFingerprint = {
+                        fingerprintName -> navController.navigate(Screen.FingerprintDetail.withArgs(fingerprintName))
+                                    },
+                onAddFingerprint = {
+                    navController.navigate(Screen.AddFingerprint.route)
+                },
+
+                // Callbacks del BottomNavBar
+                onNavigateToHome = {
+                    navController.navigate(Screen.Home.route) {
+                        popUpTo(navController.graph.startDestinationRoute!!) { saveState = true }
+                    }
+                },
+                onNavigateToAnalysis = { /* Falta implementar */ },
+                onNavigateToTransactions = { /* Falta implementar */ },
+                onNavigateToCategory = { /* Falta implementar */ },
+                onNavigateToProfile = { navController.navigate(Screen.Profile.route) }
+            )
+        }
+
+        composable(
+            route = Screen.FingerprintDetail.route,
+            arguments = listOf(navArgument("fingerprintName") { type = NavType.StringType })
+        ) {
+            // El ViewModel se inyecta automaticamente usando hilt
+            // y obtiene 'fingerprintName' del SavedStateHandle.
+
+            FingerprintDetailScreen(
+                darkTheme = isDarkTheme,
+                currentRoute = Screen.Profile.route, // Mantiene Profile seleccionado en navbar
+                onNavigateBack = { navController.popBackStack() },
+
+                // El ViewModel se encarga de la logica y nos avisa
+                // cuando debe navegar hacia atras
+                onDeleteSuccess = {
+                    navController.popBackStack()
+                },
+
+                // Callbacks del BottomNavBar
+                onNavigateToHome = {
+                    navController.navigate(Screen.Home.route) {
+                        popUpTo(navController.graph.startDestinationRoute!!) { saveState = true }
+                    }
+                },
+                onNavigateToAnalysis = { /* Falta implementar */ },
+                onNavigateToTransactions = { /* Falta implementar */ },
+                onNavigateToCategory = { /* Falta implementar */ },
+                onNavigateToProfile = { navController.navigate(Screen.Profile.route) }
+            )
+        }
+
+        composable(Screen.AddFingerprint.route) {
+            AddFingerprintScreen(
+                darkTheme = isDarkTheme,
+                currentRoute = Screen.Profile.route, // Mantiene Profile seleccionado en navbar
+                onNavigateBack = { navController.popBackStack() },
+
+                // Callbacks del BottomNavBar
+                onNavigateToHome = {
+                    navController.navigate(Screen.Home.route) {
+                        popUpTo(navController.graph.startDestinationRoute!!) { saveState = true }
+                    }
+                },
+                onNavigateToAnalysis = { /* Falta implementar */ },
+                onNavigateToTransactions = { /* Falta implementar */ },
+                onNavigateToCategory = { /* Falta implementar */ },
+                onNavigateToProfile = { navController.navigate(Screen.Profile.route) }
+            )
+        }
+
+        // Pantalla Terms And Conditions
+        composable(Screen.TermsAndConditions.route) {
+            TermsAndConditionsScreen(
+                darkTheme = isDarkTheme,
+                currentRoute = Screen.Profile.route, // Mantiene Profile seleccionado en navbar
+                onNavigateBack = { navController.popBackStack() },
+                onAccept = {
+                    // Falta implementar
+                    navController.popBackStack()
+                },
+
+                // Callbacks del BottomNavBar
+                onNavigateToHome = {
+                    navController.navigate(Screen.Home.route) {
+                        popUpTo(navController.graph.startDestinationRoute!!) { saveState = true }
+                    }
+                },
+                onNavigateToAnalysis = { /* Falta implementar */ },
+                onNavigateToTransactions = { /* Falta implementar */ },
+                onNavigateToCategory = { /* Falta implementar */ },
+                onNavigateToProfile = { navController.navigate(Screen.Profile.route) }
+            )
+        }
             // Aca van mas pantallas (ejemplo)
             composable(Screen.SavingGoals.route) {
                 PlaceholderScreen("Saving Goals Screen") // Falta la logica
