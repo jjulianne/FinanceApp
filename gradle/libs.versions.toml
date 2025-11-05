@@ -38,6 +38,7 @@ coroutinesTest = "1.10.2"
 navigationRuntimeKtx = "2.9.5"
 foundationLayout = "1.9.4"
 datastorePreferences = "1.1.1"
+foundation = "1.9.4"
 
 
 [libraries]
@@ -90,6 +91,7 @@ runner = { group = "androidx.test", name = "runner", version.ref = "runner" }
 androidx-navigation-runtime-ktx = { group = "androidx.navigation", name = "navigation-runtime-ktx", version.ref = "navigationRuntimeKtx" }
 androidx-compose-foundation-layout = { group = "androidx.compose.foundation", name = "foundation-layout", version.ref = "foundationLayout" }
 androidx-datastore-preferences = { group = "androidx.datastore", name = "datastore-preferences", version.ref = "datastorePreferences" }
+androidx-foundation = { group = "androidx.compose.foundation", name = "foundation", version.ref = "foundation" }
 
 
 [plugins]

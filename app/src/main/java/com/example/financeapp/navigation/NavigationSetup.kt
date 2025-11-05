@@ -12,6 +12,9 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.financeapp.ui.screens.SplashScreen
+import com.example.financeapp.ui.screens.category.CategoriesScreen
+import com.example.financeapp.ui.screens.category.FoodScreen
+import com.example.financeapp.ui.screens.expense.add_expense.AddExpenseScreen
 
 // Definicion de rutas de navegacion
 sealed class Screen(val route: String) {
@@ -19,6 +22,14 @@ sealed class Screen(val route: String) {
     object Launch : Screen("launch")
     object Home : Screen("home")
     // Aca van mas pantallas
+
+    object Categories : Screen("category_route")
+    object Food : Screen("food_route")
+
+    object AddExpenses : Screen( "add_expense")
+
+
+
 }
 
 @Composable
@@ -54,8 +65,24 @@ fun FinWiseNavigation(
             // HomeScreen()
             PlaceholderScreen("Home Screen")
         }
+
+
+        composable(Screen.Categories.route) {
+            CategoriesScreen(navController = navController, darkTheme = false)
+        }
+        composable(Screen.Food.route) {
+            FoodScreen(
+                navController = navController, darkTheme = false)
+        }
+        composable(Screen.AddExpenses.route) {
+            AddExpenseScreen(
+                darkTheme = false
+            )
+        }
+
     }
 }
+
 
 // Pantalla temporal de placeholder
 @Composable

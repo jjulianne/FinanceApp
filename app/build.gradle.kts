@@ -72,6 +72,7 @@ dependencies {
     implementation(libs.androidx.navigation.runtime.ktx)
     implementation(libs.androidx.compose.foundation.layout)
     implementation(libs.androidx.datastore.preferences)
+    implementation(libs.androidx.foundation)
     ksp(libs.hilt.compiler)             // Procesador de anotaciones de Hilt (KSP)
 
     // PERSISTENCIA DE DATOS (ROOM)

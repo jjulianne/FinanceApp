@@ -25,6 +25,18 @@ val Cyprus = Color(0xFF0E3E3E)         // Dark surface / Light text
 val FenceGreen = Color(0xFF052224)       // Dark background
 val BackgroundDarkCard = Color(0xFF093030)  // Dark surface variant
 
+val LightBlue = Color (0xFF6DB6FE)
+
+val vividBlue = Color (0xFF3299FF)
+
+val OceanBlue = Color (0xFF0068FF)
+
+val TotalBlack= Color (0xFF000000)
+
+
+
+val buttom = LightBlue
+val buttomPressed = OceanBlue
 val FinWiseLightPrimary = CaribbeanGreen
 val FinWiseLightOnPrimary = Color.White
 val FinWiseLightBackground = CaribbeanGreen   // Fondo verde de la pantalla
