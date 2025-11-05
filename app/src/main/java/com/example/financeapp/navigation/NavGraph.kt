@@ -137,7 +137,6 @@ fun FinWiseNavigation(
                 }
             )
         }
-
         // Rutas de Autenticacion
 
         //Login
@@ -188,6 +187,7 @@ fun FinWiseNavigation(
                     navController.navigate(Screen.Login.route)
                 },
                 onResetPassword = {
+                    // 👇 Cuando el usuario toca "Next step", lo mandamos al PIN screen
                     navController.navigate(Screen.Security.route)
                 },
                 onNavigateToSignUp = {
