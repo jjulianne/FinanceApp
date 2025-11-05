@@ -17,7 +17,6 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.financeapp.ui.screens.launch.Onboarding1Screen
 import com.example.financeapp.ui.screens.launch.Onboarding2Screen
-import com.example.financeapp.ui.screens.launch.WelcomeScreen
 import com.example.financeapp.ui.screens.launch.SplashScreen
 import com.example.financeapp.ui.screens.auth.LoginScreen
 import com.example.financeapp.ui.screens.auth.SignUpScreen
@@ -43,7 +42,7 @@ import com.example.financeapp.ui.screens.security.FingerprintDetailScreen
 import com.example.financeapp.ui.screens.security.TermsAndConditionsScreen
 
 
-// Definicion de rutas de navegacion de la aplicacion
+// --- Application Screen Routes ---
 sealed class Screen(val route: String) {
     // Rutas de Inicio (Launch)
     object Splash : Screen("splash_route")
@@ -54,7 +53,7 @@ sealed class Screen(val route: String) {
     object Logout : Screen("logout_route")
 // Pantalla principal
 
-    // Rutas de Autenticación (Auth)
+    // Rutas de Autenticación
     object Login : Screen("login_route")
     object SignUp : Screen("signup_route")
     object ForgotPassword : Screen("forgot_password_route")
@@ -64,6 +63,10 @@ sealed class Screen(val route: String) {
 
 
 
+
+    // Rutas de Filtros de Transactions
+    object Income : Screen("income_route")
+    object Expense : Screen("expense_route")
 
     // Rutas de Perfil y Configuración
     object Profile : Screen("profile_route")
@@ -108,7 +111,7 @@ fun FinWiseNavigation(
     isDarkTheme: Boolean,
     onThemeChange: (Boolean) -> Unit,
     navController: NavHostController = rememberNavController(),
-    startDestination: String = Screen.Splash.route
+    startDestination: String = Screen.Home.route
 ) {
     NavHost(
         navController = navController,
@@ -119,10 +122,6 @@ fun FinWiseNavigation(
 
         // Pantalla Splash (inicial)
         composable(Screen.Splash.route) {
-            // El SplashScreen decide el destino segun el estado de autenticacion:
-            // - Home (si ya esta autenticado)
-            // - Onboarding (si es la primera vez)
-            // - Login (si no esta autenticado, pero ya vio onboarding)
             SplashScreen(
                 onNavigateToHome = {
                     navController.navigate(Screen.Home.route) {
@@ -142,39 +141,14 @@ fun FinWiseNavigation(
             )
         }
 
-        // Pantalla Onboarding 1 (Welcome To Expense Manager)
-        composable(Screen.Onboarding1.route) {
-            Onboarding1Screen(
-                onNext = {
-                    navController.navigate(Screen.Onboarding2.route)
-                }
-            )
-        }
-
-        // Pantalla Onboarding 2 (Are You Ready To Take Control Of Your Finances?)
-        composable(Screen.Onboarding2.route) {
-            Onboarding2Screen(
-                onNext = {
-                    navController.navigate(Screen.Welcome.route)
-                },
-                onBack = {
-                    navController.popBackStack()
-                }
-            )
-        }
-
-        // Pantalla Welcome (Log In / Sign Up)
+        // Pantallas Onboarding y Welcome
+        composable(Screen.Onboarding1.route) { Onboarding1Screen(onNext = { navController.navigate(Screen.Onboarding2.route) }) }
+        composable(Screen.Onboarding2.route) { Onboarding2Screen(onNext = { navController.navigate(Screen.Welcome.route) }, onBack = { navController.popBackStack() }) }
         composable(Screen.Welcome.route) {
             WelcomeScreen(
-                onNavigateToLogin = {
-                    navController.navigate(Screen.Login.route)
-                },
-                onNavigateToSignUp = {
-                    navController.navigate(Screen.SignUp.route)
-                },
-                onNavigateToForgotPassword = {
-                    navController.navigate(Screen.ForgotPassword.route)
-                }
+                onNavigateToLogin = { navController.navigate(Screen.Login.route) },
+                onNavigateToSignUp = { navController.navigate(Screen.SignUp.route) },
+                onNavigateToForgotPassword = { navController.navigate(Screen.ForgotPassword.route) }
             )
         }
         // Rutas de Autenticacion
