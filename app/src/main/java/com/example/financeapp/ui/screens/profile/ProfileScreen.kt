@@ -39,9 +39,11 @@ import com.example.financeApp.R
 import com.example.financeapp.components.BottomNavBar
 import com.example.financeapp.components.AppHeader
 import com.example.financeapp.ui.theme.FinanceAppTheme
+import com.example.financeapp.viewmodel.AuthViewModel
 
 @Composable
 fun ProfileScreen(
+    authViewModel: AuthViewModel = hiltViewModel(),
     viewModel: ProfileViewModel = hiltViewModel(),
     darkTheme: Boolean,
     currentRoute: String = "profile_route",
@@ -119,7 +121,9 @@ fun ProfileScreen(
                 LogoutConfirmationDialog(
                     onConfirm = {
                         showLogoutDialog = false
-                        onLogout()
+                        authViewModel.logout { // 👈 acá llamamos al viewmodel
+                            onLogout()      // 👈 cuando termina, redirigimos
+                        }
                     },
                     onCancel = {
                         showLogoutDialog = false

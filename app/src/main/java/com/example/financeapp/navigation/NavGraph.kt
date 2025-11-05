@@ -290,6 +290,7 @@ fun FinWiseNavigation(
 
 
 
+
         // Pantallas principales (ejemplo)
         composable(Screen.Home.route) {
             HomeScreen(
@@ -345,7 +346,12 @@ fun FinWiseNavigation(
                 onNavigateToSecurity = { navController.navigate(Screen.Security.route) },
                 onNavigateToSettings = { navController.navigate(Screen.Settings.route) },
                 onNavigateToHelp = { navController.navigate(Screen.Help.route) },
-                onLogout = { /* Falta implementar */ },
+                onLogout = {   navController.navigate(Screen.Welcome.route) {
+                    popUpTo(navController.graph.findStartDestination().id) {
+                        inclusive = true // Limpia el stack para que no pueda volver atrás
+                    }
+                    launchSingleTop = true
+                }},
 
                 // Callbacks del BottomNavBar
                 // (Usamos popUpTo para evitar apilar pantallas)
