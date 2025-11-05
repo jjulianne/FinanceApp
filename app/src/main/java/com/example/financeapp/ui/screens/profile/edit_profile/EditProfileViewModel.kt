@@ -3,10 +3,7 @@ package com.example.financeapp.ui.screens.profile.edit_profile
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.financeapp.ui.screens.profile.Address
-import com.example.financeapp.ui.screens.profile.Geolocation
-import com.example.financeapp.ui.screens.profile.Name
-import com.example.financeapp.ui.screens.profile.User
+import com.example.financeapp.domain.repository.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -19,7 +16,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class EditProfileViewModel @Inject constructor(
-    // private val userRepository: UserRepository
+    private val userRepository: UserRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(EditProfileUiState())
@@ -31,7 +28,7 @@ class EditProfileViewModel @Inject constructor(
     init {
         loadInitialData()
     }
-
+/*
     /**
      * Carga los datos iniciales "mockeados" del usuario.
      */
@@ -71,6 +68,45 @@ class EditProfileViewModel @Inject constructor(
                     formEmail = fakeUser.email,
                     formPushNotifications = true // Valor por defecto
                 )
+            }
+        }
+    }
+ */
+
+    /**
+     * Carga los datos iniciales del usuario desde el repositorio.
+     */
+    private fun loadInitialData() {
+        viewModelScope.launch {
+            // Seteamos estado de carga y limpiamos errores
+            _uiState.update { it.copy(isLoading = true, errorMessage = null) }
+
+            try {
+                // 3. OBTENEMOS EL USUARIO REAL (limpio)
+                val user = userRepository.getUserProfile()
+
+                // 4. Actualizamos el estado con los datos cargados
+                _uiState.update {
+                    it.copy(
+                        isLoading = false,
+                        // Usamos los campos del 'user' limpio
+                        userId = user.user_id.toIntOrNull() ?: 0,
+                        originalUsername = user.name,
+                        // Rellenamos los campos del formulario
+                        formUsername = user.name,
+                        formPhone = user.phone,
+                        formEmail = user.email,
+                        formPushNotifications = true // Valor por defecto
+                    )
+                }
+
+            } catch (e: Exception) {
+                _uiState.update {
+                    it.copy(
+                        isLoading = false,
+                        errorMessage = e.message ?: "No se pudo cargar el perfil"
+                    )
+                }
             }
         }
     }

@@ -82,6 +82,14 @@ fun EditProfileScreen(
 
             if (uiState.isLoading) {
                 CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+            } else if (uiState.errorMessage != null) {
+                Text(
+                    text = uiState.errorMessage!!,
+                    color = MaterialTheme.colorScheme.error,
+                    modifier = Modifier.align(Alignment.Center).padding(32.dp),
+                    textAlign = TextAlign.Center
+                )
+
             } else {
                 // Mostramos el contenido solo cuando la carga termino
                 EditProfileContent(

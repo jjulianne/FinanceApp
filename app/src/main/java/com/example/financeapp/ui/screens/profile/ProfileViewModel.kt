@@ -2,6 +2,8 @@ package com.example.financeapp.ui.screens.profile
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.financeapp.domain.model.User
+import com.example.financeapp.domain.repository.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -12,7 +14,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ProfileViewModel @Inject constructor(
-    // private val userRepository: UserRepository // Falta conectar Retrofit
+    private val userRepository: UserRepository
 ) : ViewModel() {
 
     // Flujo de estado privado y mutable
@@ -24,10 +26,10 @@ class ProfileViewModel @Inject constructor(
         // En cuanto el ViewModel se crea, carga los datos del perfil
         loadUserProfile()
     }
-
+/*
     /**
-     * Simula la carga de datos del perfil.
-     * Aca tenemos que llamar a `userRepository.getProfile()`.
+     * Simulador antiguo de  carga de datos del perfil.
+     * Ahora usamos el `userRepository.getProfile()`.
      */
     fun loadUserProfile() {
         viewModelScope.launch {
@@ -56,5 +58,33 @@ class ProfileViewModel @Inject constructor(
             // Error
             // _uiState.update { ProfileUiState.Error("No se pudo conectar al servidor.") }
         }
+ */
+    /**
+     * Carga los datos del perfil desde el repositorio.
+     */
+    fun loadUserProfile() {
+        viewModelScope.launch {
+            _uiState.update { ProfileUiState.Loading }
+
+            try {
+                // Se obtiene el usuario del repositorio
+                // El repositorio ahora hace el mapeo, y esto devuelve
+                // el nuevo modelo User(user_id, name, email, balance).
+                val user = userRepository.getUserProfile()
+
+                // Actualizamos el UI State con el usuario
+                _uiState.update { ProfileUiState.Success(user) }
+
+            } catch (e: Exception) {
+                // Capturamos la excepcion (de red, de parseo, etc.)
+                // y actualizamos el UI State con el mensaje de error.
+                _uiState.update {
+                    ProfileUiState.Error(
+                        e.message ?: "Ocurrió un error desconocido"
+                    )
+                }
+            }
+        }
     }
 }
+

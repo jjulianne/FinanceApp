@@ -1,6 +1,6 @@
 package com.example.financeapp.data.repository.network.retrofit
 
-import com.example.financeapp.domain.model.User
+import com.example.financeapp.data.repository.network.dto.UserNetworkDto
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.Header
@@ -26,6 +26,6 @@ interface AuthApiService {
     @GET("users/12345")
     suspend fun getUserProfile(
         @Header("x-api-key") apiKey: String = "123456789"
-    ): retrofit2.Response<User>
+    ): retrofit2.Response<UserNetworkDto>
 }
 

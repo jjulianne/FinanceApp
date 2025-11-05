@@ -39,9 +39,13 @@ import com.example.financeApp.R
 import com.example.financeapp.components.BottomNavBar
 import com.example.financeapp.components.AppHeader
 import com.example.financeapp.ui.theme.FinanceAppTheme
+import com.example.financeapp.domain.model.User
+import com.example.financeapp.viewmodel.AuthViewModel
+
 
 @Composable
 fun ProfileScreen(
+    authViewModel: AuthViewModel = hiltViewModel(),
     viewModel: ProfileViewModel = hiltViewModel(),
     darkTheme: Boolean,
     currentRoute: String = "profile_route",
@@ -119,7 +123,9 @@ fun ProfileScreen(
                 LogoutConfirmationDialog(
                     onConfirm = {
                         showLogoutDialog = false
-                        onLogout()
+                        authViewModel.logout { // 👈 acá llamamos al viewmodel
+                            onLogout()      // 👈 cuando termina, redirigimos
+                        }
                     },
                     onCancel = {
                         showLogoutDialog = false
@@ -174,7 +180,7 @@ private fun ProfileContent(
 
     // Nombre de Usuario
     Text(
-        text = user.fullName,
+        text = user.name,
         fontSize = 20.sp,
         fontWeight = FontWeight.Bold,
         color = MaterialTheme.colorScheme.onSurface,
@@ -186,7 +192,7 @@ private fun ProfileContent(
 
     // ID de Usuario
     Text(
-        text = "ID: ${user.id}",
+        text = "ID: ${user.user_id}",
         fontSize = 12.sp,
         fontWeight = FontWeight.Normal,
         color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
