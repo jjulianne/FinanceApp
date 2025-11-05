@@ -73,6 +73,7 @@ fun ProfileScreen(
             )
         }
     ) { _ -> // Antes tenia un padding el cual borre porque sino me tiraba la pantalla para abajo
+
         // Box principal con fondo verde
         Box(
             modifier = Modifier
