@@ -24,7 +24,8 @@ import com.example.financeapp.ui.screens.auth.SignUpScreen
 import com.example.financeapp.ui.screens.auth.ForgotPasswordScreen
 import com.example.financeapp.ui.screens.auth.NewPasswordScreen
 import com.example.financeapp.ui.screens.auth.PasswordChangedSuccessScreen
-import com.example.financeapp.ui.screens.auth.SecurityPinScreen
+import com.example.financeapp.ui.screens.auth.PinScreen
+
 import com.example.financeapp.ui.screens.home.HomeScreen
 import com.example.financeapp.ui.screens.profile.ProfileScreen
 import com.example.financeapp.ui.screens.profile.edit_profile.EditProfileScreen
@@ -101,6 +102,7 @@ sealed class Screen(val route: String) {
 
     object Help : Screen("help_route")
     object OnlineSupport : Screen("online_support_route")
+    object Pin: Screen( route = "pin_route")
     object SupportChat : Screen("support_chat_route/{chatId}") {
         fun withArgs(chatId: String): String {
             return "support_chat_route/$chatId"
@@ -234,7 +236,7 @@ fun FinWiseNavigation(
                 },
                 onResetPassword = {
                     // 👇 Cuando el usuario toca "Next step", lo mandamos al PIN screen
-                    navController.navigate(Screen.Security.route)
+                    navController.navigate(Screen.Pin.route)
                 },
                 onNavigateToSignUp = {
                     navController.navigate(Screen.SignUp.route)
@@ -242,8 +244,8 @@ fun FinWiseNavigation(
             )
         }
         // Pantalla Security PIN
-        composable(Screen.Security.route) {
-            SecurityPinScreen(
+        composable(Screen.Pin.route) {
+            PinScreen(
                 onAccept = {
                     navController.navigate(Screen.NewPassword.route)
                 },

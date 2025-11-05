@@ -102,7 +102,7 @@ fun SignUpScreen(
         Spacer(modifier = Modifier.height(16.dp))
 
         // 🟢 Botón principal
-        AppButton(
+        AppOutlinedButton(
             text = "Sign Up",
             onClick = onSignUp
         )
