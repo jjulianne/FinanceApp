@@ -17,7 +17,7 @@ interface AuthRepository {
      * Guarda la nueva contraseña del usuario.
      */
     suspend fun savePassword(password: String)
-}
+
     // Nuevo método: login con credenciales
     suspend fun login(email: String, password: String): User
 

@@ -111,14 +111,10 @@ class AuthRepositoryImpl @Inject constructor(
         delay(1500L) // Simula una llamada de red
         println("Nueva contraseña guardada (simulación): $password")
     }
-}
-
 
     // 🔒 Método auxiliar opcional (para cerrar sesión)
     override suspend fun logout() {
         userSessionDao.clearSession()
     }
 
-
 }
-
