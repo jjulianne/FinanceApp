@@ -44,11 +44,20 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.compose.rememberNavController
 import com.example.financeapp.ui.screens.home.components.ExpenseProgressIndicator
 import com.example.financeapp.ui.theme.FinanceAppTheme
+import com.example.financeapp.components.BottomNavBar
+import androidx.compose.foundation.isSystemInDarkTheme
 
 @Composable
 fun HomeScreen(
     navController: NavController,
-    viewModel: HomeViewModel = hiltViewModel()
+    viewModel: HomeViewModel = hiltViewModel(),
+    darkTheme: Boolean,
+    currentRoute: String = "home_route",
+    onNavigateToHome: () -> Unit = {},
+    onNavigateToAnalysis: () -> Unit = {},
+    onNavigateToTransactions: () -> Unit = {},
+    onNavigateToCategory: () -> Unit = {},
+    onNavigateToProfile: () -> Unit = {}
 ) {
     // Variables de estado del ViewModel
     val totalBalance by viewModel.totalBalance.collectAsStateWithLifecycle()
@@ -68,7 +77,18 @@ fun HomeScreen(
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
-        containerColor = colorResource(id = R.color.honeydew) // Fondo base de toda la pantalla
+        containerColor = colorResource(id = R.color.honeydew), // Fondo base de toda la pantalla
+        bottomBar = {
+            BottomNavBar(
+                currentRoute = currentRoute,
+                darkTheme = darkTheme,
+                onNavigateToHome = onNavigateToHome,
+                onNavigateToAnalysis = onNavigateToAnalysis,
+                onNavigateToTransactions = onNavigateToTransactions,
+                onNavigateToCategory = onNavigateToCategory,
+                onNavigateToProfile = onNavigateToProfile
+            )
+        }
     ) { innerPadding ->
         Box(
             modifier = Modifier
@@ -243,7 +263,10 @@ fun HomeScreen(
 @Composable
 fun HomeScreenPreview() {
     val navController = rememberNavController()
-    FinanceAppTheme {
-        HomeScreen(navController = navController)
+    FinanceAppTheme(darkTheme = false) {
+        HomeScreen(
+            navController = navController,
+            darkTheme = false
+        )
     }
 }

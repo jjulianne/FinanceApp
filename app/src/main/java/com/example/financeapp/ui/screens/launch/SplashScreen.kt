@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -31,9 +32,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.financeApp.R
 import com.example.financeapp.domain.use_case.auth.CheckAuthState
-import com.example.financeapp.ui.theme.FinWiseDarkIcon
-import com.example.financeapp.ui.theme.FinWiseGreen
-import com.example.financeapp.ui.theme.FinWiseWhite
+import com.example.financeapp.ui.theme.FinanceAppTheme
 import kotlinx.coroutines.delay
 
 @Composable
@@ -101,7 +100,7 @@ fun SplashScreen(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(FinWiseGreen), // background: #00D09E del Figma
+            .background(MaterialTheme.colorScheme.primary), // background: #00D09E del Figma
         contentAlignment = Alignment.Center
     ) {
         Column(
@@ -117,7 +116,7 @@ fun SplashScreen(
                 painter = painterResource(id = R.drawable.ic_finwise_icon),
                 contentDescription = "FinWise Icon",
                 modifier = Modifier.size(width = 109.dp, height = 115.dp),
-                colorFilter = ColorFilter.tint(FinWiseDarkIcon) // Color del icono: #0E3E3E
+                colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.primaryContainer) // Color del icono: #0E3E3E
             )
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -127,7 +126,7 @@ fun SplashScreen(
                 text = "FinWise",
                 fontSize = 52.sp,
                 fontWeight = FontWeight.SemiBold, // Poppins SemiBold 600
-                color = FinWiseWhite, // Color del texto: #FFFFFF (blanco)
+                color = MaterialTheme.colorScheme.secondary, // Color del texto: #FFFFFF (blanco)
                 letterSpacing = 0.sp
             )
         }
@@ -137,9 +136,11 @@ fun SplashScreen(
 @Preview(showBackground = true, widthDp = 430, heightDp = 932)
 @Composable
 fun SplashScreenPreview() {
-    SplashScreen(
-        onNavigateToHome = {},
-        onNavigateToOnboarding = {},
-        onNavigateToLogin = {}
-    )
+    FinanceAppTheme(darkTheme = false) {
+        SplashScreen(
+            onNavigateToHome = {},
+            onNavigateToOnboarding = {},
+            onNavigateToLogin = {}
+        )
+    }
 }
